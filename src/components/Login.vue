@@ -21,9 +21,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { origin } from '@/config.js'
-
 export default {
   data () {
     return {
@@ -55,9 +52,6 @@ export default {
   },
   mounted () {
     this.generateDXVerify()
-    // setTimeout(() => {
-    //   console.log(this.captcha) // 返回的是空对象
-    // }, 10000)
   },
   methods: {
     generateDXVerify () {
@@ -95,19 +89,29 @@ export default {
         }
         if (!this.verified) {
           this.$message({
-            message: '滑动验证码',
+            message: '滑动验证码，进行验证',
             type: 'error'
           })
           return
         }
-        axios({
-          url: origin + '/v1/employ/login',
-          method: 'post',
-          data: Object.assign({}, this.form, { dxToken: this.dxToken }),
-          withCredentials: true
-        })
+        let data = Object.assign({}, this.form, { dxToken: this.dxToken })
+        this.$store.dispatch('goLogin', data)
           .then(res => {
-            console.log(res.data)
+            if (res.data.success) {
+              this.$store.commit('changeLoginAuth', true)
+              this.$store.commit('changeUserInfo', res.data.user_info)
+              this.$router.push({
+                name: 'Home'
+              })
+            } else {
+              if (res.data.code === 10001) {
+                this.captcha.reload()
+              }
+              this.$message({
+                message: res.data.msg,
+                type: 'error'
+              })
+            }
           })
           .catch(err => {
             console.log(err)
