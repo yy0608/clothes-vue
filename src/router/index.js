@@ -3,6 +3,11 @@ import Router from 'vue-router'
 import App from '@/App'
 import Home from '@/components/Home'
 import Login from '@/components/Login'
+import Merchants from '@/components/Merchants'
+import MerchantAdd from '@/components/MerchantAdd'
+import Categories from '@/components/Categories'
+import Goods from '@/components/Goods'
+import Users from '@/components/Users'
 
 let ifCheckedLogin = false
 
@@ -21,9 +26,41 @@ const router = new Router({
           component: Login
         },
         {
-          name: 'Home',
           path: 'home',
-          component: Home
+          component: Home,
+          children: [
+            {
+              path: '',
+              redirect: {
+                name: 'Merchants'
+              }
+            },
+            {
+              name: 'Merchants',
+              path: 'merchants',
+              component: Merchants
+            },
+            {
+              name: 'MerchantAdd',
+              path: 'merchant_add',
+              component: MerchantAdd
+            },
+            {
+              name: 'Categories',
+              path: 'categories',
+              component: Categories
+            },
+            {
+              name: 'Goods',
+              path: 'goods',
+              component: Goods
+            },
+            {
+              name: 'Users',
+              path: 'users',
+              component: Users
+            }
+          ]
         }
       ]
     }
@@ -32,7 +69,7 @@ const router = new Router({
 
 function goDiffPath (to, next) {
   if (to.path === '/login') {
-    return next({ name: 'Home' })
+    return next('/home')
   } else {
     return next({ path: to.path })
   }

@@ -100,9 +100,7 @@ export default {
             if (res.data.success) {
               this.$store.commit('changeLoginAuth', true)
               this.$store.commit('changeUserInfo', res.data.user_info)
-              this.$router.push({
-                name: 'Home'
-              })
+              this.$router.push('/home')
             } else {
               if (res.data.code === 10001) {
                 this.captcha.reload()

@@ -5,7 +5,7 @@ const actions = {
   goLogin ({ commit, state }, data) {
     return new Promise((resolve, reject) => {
       axios({
-        url: origin + '/v1/employ/login',
+        url: origin + '/employ/login',
         method: 'post',
         data,
         withCredentials: true
