@@ -21,8 +21,8 @@
       <el-input type="number" v-model="form.code"></el-input>
       <el-button class="send-code" :disabled="!phoneWrote || smsSent" @click="smsSend">{{smsSent ? countDown + 's' : '发送验证码'}}</el-button>
     </el-form-item>
-    <el-form-item label="备注" prop="desc">
-      <el-input v-model="form.desc"></el-input>
+    <el-form-item label="描述" prop="desc">
+      <el-input v-model="form.desc" placeholder="填写描述或备注"></el-input>
     </el-form-item>
     <el-form-item>
       <el-button class="login-btn" type="primary" @click="submit">添加</el-button>
@@ -93,10 +93,26 @@ export default {
             withCredentials: true
           })
             .then(res => {
-              this.$message({
-                message: res.data.msg,
-                type: res.data.success ? 'success' : 'error'
-              })
+              if (!res.data.success) {
+                this.$message({
+                  message: res.data.msg,
+                  type: 'error'
+                })
+              } else {
+                this.$alert(`账号：${res.data.data.phone}<br>密码：${res.data.data.password}`, '请妥善保存', {
+                  dangerouslyUseHTMLString: true,
+                  confirmButtonText: '我知道了',
+                  callback: () => {
+                    this.$message({
+                      message: res.data.msg,
+                      type: 'success'
+                    })
+                    setTimeout(() => {
+                      this.$router.go(-1)
+                    }, 1000)
+                  }
+                })
+              }
             })
             .catch(err => {
               console.log(err)
@@ -152,6 +168,10 @@ export default {
         }
       }, 1000)
     }
+    // reset () {
+    //   this.$refs.form.resetFields()
+    //   console.log(this.form)
+    // }
   }
 }
 </script>

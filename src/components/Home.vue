@@ -54,10 +54,21 @@ export default {
         withCredentials: true
       })
         .then(res => {
-          console.log(res.data)
+          if (res.data.success) {
+            this.$router.push('/login')
+          } else {
+            this.$message({
+              message: res.data.msg,
+              type: 'error'
+            })
+          }
         })
         .catch(err => {
           console.log(err)
+          this.$message({
+            message: '退出失败',
+            type: 'error'
+          })
         })
     },
     checkPathHasString (path) {

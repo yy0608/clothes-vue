@@ -5,6 +5,7 @@ import Home from '@/components/Home'
 import Login from '@/components/Login'
 import Merchants from '@/components/Merchants'
 import MerchantAdd from '@/components/MerchantAdd'
+import MerchantShops from '@/components/MerchantShops'
 import Categories from '@/components/Categories'
 import Goods from '@/components/Goods'
 import Users from '@/components/Users'
@@ -38,12 +39,20 @@ const router = new Router({
             {
               name: 'Merchants',
               path: 'merchants',
-              component: Merchants
+              component: Merchants,
+              meta: {
+                hasPage: true
+              }
             },
             {
               name: 'MerchantAdd',
               path: 'merchant_add',
               component: MerchantAdd
+            },
+            {
+              name: 'MerchantShops',
+              path: 'merchant_shops/:_id',
+              component: MerchantShops
             },
             {
               name: 'Categories',
@@ -67,11 +76,21 @@ const router = new Router({
   ]
 })
 
-function goDiffPath (to, next) {
+function goDiffPath (to, next, store) {
   if (to.path === '/login') {
     return next('/home')
   } else {
-    return next({ path: to.path })
+    if (!Object.keys(to.query).length && to.meta.hasPage) {
+      return next({
+        path: to.path,
+        query: {
+          page: store.state.page,
+          limit: store.state.limit
+        }
+      })
+    } else {
+      return next({ path: to.path })
+    }
   }
 }
 
@@ -80,19 +99,32 @@ router.beforeEach((to, from, next) => {
   let state = store.state
   let userInfo = state.userInfo
   let loginAuth = state.loginAuth
+  if (to.path !== from.path) { // 如果路由变化，还原到默认页码数设置
+    store.commit('resetPage')
+  }
   if (ifCheckedLogin) {
-    // return next({ to: to.path })
     if (loginAuth) {
-      return next({ to: to.path })
+      if (!Object.keys(to.query).length && to.meta.hasPage) {
+        return next({
+          path: to.path,
+          query: {
+            page: store.state.page,
+            limit: store.state.limit
+          }
+        })
+      } else {
+        return next({ to: to.path })
+      }
     } else {
       if (to.name === 'Login') {
-        next()
+        return next()
       }
       return next({ name: 'Login' })
     }
   }
+
   if (userInfo) {
-    goDiffPath(to, next)
+    goDiffPath(to, next, store)
   } else {
     store.dispatch('goLogin')
       .then(res => {
@@ -100,7 +132,7 @@ router.beforeEach((to, from, next) => {
         if (res.data.success) {
           store.commit('changeLoginAuth', true)
           store.commit('changeUserInfo', res.data.user_info)
-          goDiffPath(to, next)
+          goDiffPath(to, next, store)
         } else {
           store.commit('changeLoginAuth', false)
           return next({ name: 'Login' })

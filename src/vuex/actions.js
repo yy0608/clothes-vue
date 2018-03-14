@@ -17,6 +17,29 @@ const actions = {
           reject(err)
         })
     })
+  },
+  getMerchantList ({ commit, state }) {
+    return new Promise((resolve, reject) => {
+      axios({
+        url: origin + '/employ/merchant_list',
+        method: 'get',
+        params: {
+          page: state.page,
+          limit: state.limit
+        },
+        withCredentials: true
+      })
+        .then(res => {
+          if (res.data.success) {
+            state.merchantList = res.data.data
+            state.merchantsCount = res.data.count
+          }
+          resolve(res)
+        })
+        .catch(err => {
+          reject(err)
+        })
+    })
   }
 }
 
