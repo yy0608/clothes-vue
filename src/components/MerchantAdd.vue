@@ -1,6 +1,6 @@
 <template>
 <div class="manage-item merchant-add-cont">
-  <title-cont :title="'添加商家'"></title-cont>
+  <title-cont :title="'商家列表 > 添加商家'" :back="true"></title-cont>
   <el-form class="merchant-add-form" :model="form" ref="form" label-width="80px" label-position="left" :rules="rules">
     <el-form-item label="手机号" prop="phone">
       <el-input type="number" v-model="form.phone" @input="phoneChange"></el-input>
@@ -22,10 +22,10 @@
       <el-button class="send-code" :disabled="!phoneWrote || smsSent" @click="smsSend">{{smsSent ? countDown + 's' : '发送验证码'}}</el-button>
     </el-form-item>
     <el-form-item label="描述" prop="desc">
-      <el-input v-model="form.desc" placeholder="填写描述或备注"></el-input>
+      <el-input type="textarea" resize="none" v-model="form.desc" placeholder="填写描述或备注或微信qq等其他信息"></el-input>
     </el-form-item>
     <el-form-item>
-      <el-button class="login-btn" type="primary" @click="submit">添加</el-button>
+      <el-button type="primary" @click="submit">添加</el-button>
     </el-form-item>
   </el-form>
 </div>

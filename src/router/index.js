@@ -6,6 +6,7 @@ import Login from '@/components/Login'
 import Merchants from '@/components/Merchants'
 import MerchantAdd from '@/components/MerchantAdd'
 import MerchantShops from '@/components/MerchantShops'
+import ShopAdd from '@/components/ShopAdd'
 import Categories from '@/components/Categories'
 import Goods from '@/components/Goods'
 import Users from '@/components/Users'
@@ -53,6 +54,11 @@ const router = new Router({
               name: 'MerchantShops',
               path: 'merchant_shops/:_id',
               component: MerchantShops
+            },
+            {
+              name: 'ShopAdd',
+              path: 'shop_add/:_id',
+              component: ShopAdd
             },
             {
               name: 'Categories',

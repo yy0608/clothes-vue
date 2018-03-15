@@ -1,6 +1,6 @@
 <template>
 <div class="manage-item merchants-manage-cont">
-  <title-cont :title="'商家列表'" :btnTitle="'添加商家'" :btnEvent="goAdd"></title-cont>
+  <title-cont :title="'商家列表'" :buttons="[{label: '添加商家', func: goAdd}]"></title-cont>
   <el-table :data="merchantList">
     <el-table-column prop="phone" label="手机"></el-table-column>
     <el-table-column prop="name" label="名称"></el-table-column>

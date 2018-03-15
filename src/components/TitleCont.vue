@@ -1,8 +1,10 @@
 <template>
 <div class="title-cont">
   <div class="title">{{title}}</div>
-  <el-button v-if="btnTitle" size="mini" @click="btnEvent">{{btnTitle}}</el-button>
-  <el-button v-else @click="goBack" size="mini" icon="el-icon-arrow-left">返回</el-button>
+  <div class="buttons-cont">
+    <el-button v-for="(item, index) in buttons" size="mini" :key="index" @click="item.func">{{item.label}}</el-button>
+    <el-button v-if="back" @click="goBack" size="mini" icon="el-icon-arrow-left">返回</el-button>
+  </div>
 </div>
 </template>
 
@@ -10,8 +12,8 @@
 export default {
   props: [
     'title',
-    'btnTitle',
-    'btnEvent'
+    'buttons',
+    'back'
   ],
   methods: {
     goBack () {
