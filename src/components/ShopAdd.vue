@@ -1,7 +1,7 @@
 <template>
 <div class="manage-item merchant-add-cont">
   <title-cont :title="'商家列表 > 店铺列表 > 添加店铺'" :back="true"></title-cont>
-  <el-form class="merchant-add-form" :model="form" ref="form" label-width="80px" label-position="left" :rules="rules">
+  <el-form class="merchant-add-form" :model="form" ref="form" label-width="100px" label-position="left" :rules="rules">
     <el-form-item label="名称" prop="name">
       <el-input v-model="form.name"></el-input>
     </el-form-item>
@@ -14,11 +14,8 @@
     <el-form-item label="地址" prop="address">
       <el-input v-model="form.address"></el-input>
     </el-form-item>
-    <el-form-item label="经度" prop="longitude ">
-      <el-input type="number" v-model.number="form.longitude"></el-input>
-    </el-form-item>
-    <el-form-item label="纬度" prop="latitude">
-      <el-input type="number" v-model.number="form.latitude"></el-input>
+    <el-form-item label="经纬度坐标" prop="location">
+      <el-input v-model="form.location" placeholder="类似114.001432,22.681253"></el-input>
     </el-form-item>
     <el-form-item label="负责人" prop="manager">
       <el-input v-model="form.manager"></el-input>
@@ -49,13 +46,36 @@ export default {
         desc: '',
         logo: '',
         address: '',
-        longitude: '',
-        latitude: '',
+        location: '',
         manager: '',
         phone: '',
         remark: ''
       },
       rules: {
+        name: [{
+          required: true,
+          message: '输入名称'
+        }],
+        desc: [{
+          required: true,
+          message: '输入描述'
+        }],
+        logo: [{
+          required: true,
+          message: '上传logo'
+        }],
+        address: [{
+          required: true,
+          message: '输入地址'
+        }],
+        location: [{
+          required: true,
+          message: '输入经纬度坐标'
+        }],
+        manager: [{
+          required: true,
+          message: '输入负责人名字'
+        }],
         phone: [{
           required: true,
           message: '输入手机号'
@@ -68,33 +88,45 @@ export default {
   },
   methods: {
     submit () {
-      var data = {
-        longitude: this.form.longitude,
-        latitude: this.form.latitude
-      }
-      console.log(data)
-      axios({
-        url: origin + '/employ/test',
-        method: 'post',
-        data,
-        withCredentials: true
+      this.$refs.form.validate(bool => {
+        if (!bool) {
+          this.$message('填写出错')
+          return
+        }
+        let _id = this.$route.params._id
+        var data = Object.assign({}, this.form, {
+          merchant_id: _id
+        })
+        axios({
+          url: origin + '/employ/shop_add',
+          method: 'post',
+          data,
+          withCredentials: true
+        })
+          .then(res => {
+            if (res.data.success) {
+              this.$message({
+                message: res.data.msg,
+                type: 'success'
+              })
+              setTimeout(() => {
+                this.$router.go(-1)
+              }, 1000)
+            } else {
+              this.$message({
+                message: res.data.msg,
+                type: 'error'
+              })
+            }
+          })
+          .catch(err => {
+            console.log(err)
+            this.$message({
+              message: '请求出错',
+              type: 'error'
+            })
+          })
       })
-        .then(res => {
-          console.log(res.data)
-        })
-        .catch(err => {
-          console.log(err)
-        })
-      // this.$refs.form.validate(bool => {
-      //   if (bool) {
-      //     axios({
-      //       url: origin + '/employ/merchant_add',
-      //       method: 'post',
-      //       data: this.form,
-      //       withCredentials: true
-      //     })
-      //   }
-      // })
     }
   }
 }

@@ -11,6 +11,15 @@ export default {
   components: {
     TitleCont
   },
+  created () {
+    this.$store.dispatch('getShopList')
+      .then(res => {
+        console.log(res.data)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  },
   methods: {
     goAdd () {
       let _id = this.$route.params._id

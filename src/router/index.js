@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import { Message, Loading } from 'element-ui'
 import App from '@/App'
 import Home from '@/components/Home'
 import Login from '@/components/Login'
@@ -82,6 +83,8 @@ const router = new Router({
   ]
 })
 
+// document.documentElement.style.backgroundColor = 'red'
+
 function goDiffPath (to, next, store) {
   if (to.path === '/login') {
     return next('/home')
@@ -132,9 +135,11 @@ router.beforeEach((to, from, next) => {
   if (userInfo) {
     goDiffPath(to, next, store)
   } else {
+    let loadingInstance = Loading.service()
     store.dispatch('goLogin')
       .then(res => {
         ifCheckedLogin = true
+        loadingInstance.close()
         if (res.data.success) {
           store.commit('changeLoginAuth', true)
           store.commit('changeUserInfo', res.data.user_info)
@@ -146,6 +151,11 @@ router.beforeEach((to, from, next) => {
       })
       .catch(err => {
         ifCheckedLogin = true
+        Message({
+          message: '服务器故障',
+          type: 'error'
+        })
+        loadingInstance.close()
         console.log(err)
         return next({ name: 'Login' })
       })

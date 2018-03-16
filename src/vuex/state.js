@@ -6,7 +6,9 @@ const state = {
   userInfo: null,
   loginAuth: false,
   merchantList: null,
-  merchantsCount: null
+  merchantsCount: null,
+  shopList: null,
+  shopsCount: null
 }
 
 export default state

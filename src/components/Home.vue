@@ -72,7 +72,7 @@ export default {
         })
     },
     checkPathHasString (path) {
-      if (/merchant/i.test(path)) {
+      if (/merchant/i.test(path) || /shop_add/i.test(path)) {
         this.routerData[0].active = true
       } else {
         this.routerData[0].active = false

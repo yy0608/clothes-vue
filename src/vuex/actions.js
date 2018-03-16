@@ -40,6 +40,30 @@ const actions = {
           reject(err)
         })
     })
+  },
+  getShopList ({ commit, state }, data) {
+    return new Promise((resolve, reject) => {
+      axios({
+        url: origin + '/employ/merchant_shops',
+        method: 'get',
+        params: {
+          page: state.page,
+          limit: state.limit,
+          merchant_id: data && data.merchant_id
+        },
+        withCredentials: true
+      })
+        .then(res => {
+          if (res.data.success) {
+            state.shopList = res.data.data
+            state.shopsCount = res.data.count
+          }
+          resolve(res)
+        })
+        .catch(err => {
+          reject(err)
+        })
+    })
   }
 }
 
