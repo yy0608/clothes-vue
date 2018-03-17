@@ -8,8 +8,18 @@
     <el-form-item label="描述" prop="desc">
       <el-input type="textarea" resize="none" v-model="form.desc"></el-input>
     </el-form-item>
-    <el-form-item label="logo" prop="logo">
-      <el-input v-model="form.logo"></el-input>
+    <el-form-item class="upload-form-item" label="logo" prop="logo">
+      <el-upload
+        class="logo-uploader"
+        action="https://upload-z2.qiniup.com"
+        :data="uploadData"
+        :show-file-list="false"
+        :on-success="handleLogoSuccess"
+        :before-upload="beforeLogoUpload">
+          <img v-if="form.logo" :src="imgUrl" class="logo">
+          <i v-else class="el-icon-plus logo-uploader-icon"></i>
+        </el-upload>
+      <el-input type="textarea" resize="none" v-model="form.logo" @change="inputLogoUrl"></el-input>
     </el-form-item>
     <el-form-item label="地址" prop="address">
       <el-input v-model="form.address"></el-input>
@@ -35,12 +45,21 @@
 
 <script>
 import axios from 'axios'
-import { origin } from '@/config.js'
+import { origin, imgOrigin } from '@/config.js'
+import { parseDate } from '@/utils.js'
 import TitleCont from './TitleCont.vue'
+import { mapState } from 'vuex'
+import md5 from 'js-md5'
 
 export default {
   data () {
     return {
+      uploadData: {
+        key: '',
+        token: ''
+      },
+      imgUrl: '',
+      parseDate: parseDate,
       form: {
         name: '',
         desc: '',
@@ -83,8 +102,25 @@ export default {
       }
     }
   },
+  computed: mapState([
+    'userInfo'
+  ]),
   components: {
     TitleCont
+  },
+  created () {
+    axios({
+      url: origin + '/employ/get_qiniu_upload_token',
+      method: 'post',
+      withCredentials: true
+    })
+      .then(res => {
+        this.uploadData.token = res.data.data
+      })
+      .catch(err => {
+        this.$message.error('获取七牛上传文件的token失败')
+        console.log(err)
+      })
   },
   methods: {
     submit () {
@@ -127,6 +163,30 @@ export default {
             })
           })
       })
+    },
+    inputLogoUrl () {
+      this.imgUrl = this.form.logo
+    },
+    handleLogoSuccess (res, file) {
+      this.form.logo = this.uploadData.key
+      this.imgUrl = imgOrigin + this.form.logo
+    },
+    beforeLogoUpload (file) {
+      let isValidImg = file.type === 'image/jpeg' || file.type === 'image/png'
+      let isLt2M = file.size / 1024 / 1024 < 2
+      if (isValidImg && isLt2M) {
+        let extension = file.type === 'image/jpeg' ? '.jpg' : '.png'
+        let filename = md5(Date.now() + this.$route.params._id + Math.random()) + extension
+        this.uploadData.key = 'shop_logo/' + filename
+      }
+
+      if (!isValidImg) {
+        this.$message.error('上传头像图片只能是 JPG 或 PNG 格式!')
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!')
+      }
+      return isValidImg && isLt2M
     }
   }
 }
@@ -143,6 +203,41 @@ export default {
   .send-code {
     width: 112px;
     margin-left: 10px;
+  }
+  .logo-uploader {
+    height: 60px;
+  }
+  .logo-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .logo-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .logo-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+  }
+  .logo {
+    width: 60px;
+    height: 60px;
+    display: block;
+  }
+  .upload-form-item {
+    .el-form-item__content {
+      display: flex;
+      align-items: center;
+      .el-textarea {
+        margin-left: 20px;
+      }
+    }
   }
 }
 </style>
