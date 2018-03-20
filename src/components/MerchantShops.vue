@@ -11,8 +11,9 @@
     </el-table-column>
     <el-table-column prop="manager" label="负责人"></el-table-column>
     <el-table-column prop="address" label="地址"></el-table-column>
-    <el-table-column label="操作" min-width="100px">
+    <el-table-column label="操作" min-width="130px">
       <template slot-scope="props">
+        <el-button size="mini" @click="goGoods(props.row._id)">商品</el-button>
         <el-button size="mini" @click="editCategory(props.row._id)">编辑</el-button>
         <el-button size="mini" @click="deleteCategory(props.$index, props.row._id)">删除</el-button>
       </template>
@@ -59,6 +60,11 @@ export default {
       let _id = this.$route.params._id
       this.$router.push({
         path: '/home/shop_add/' + _id
+      })
+    },
+    goGoods (_id) {
+      this.$router.push({
+        path: '/home/shop_goods/' + _id
       })
     },
     pageChange () {

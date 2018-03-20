@@ -6,7 +6,7 @@
     <el-table-column prop="name" label="名称"></el-table-column>
     <el-table-column prop="manager" label="联系人"></el-table-column>
     <el-table-column prop="address" label="地址"></el-table-column>
-    <el-table-column label="操作" min-width="100px">
+    <el-table-column label="操作" min-width="130px">
       <template slot-scope="props">
         <el-button size="mini" @click="goShop(props.row._id)">店铺</el-button>
         <el-button size="mini" @click="editCategory(props.row._id)">编辑</el-button>

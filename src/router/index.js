@@ -8,7 +8,10 @@ import Merchants from '@/components/Merchants'
 import MerchantAdd from '@/components/MerchantAdd'
 import MerchantShops from '@/components/MerchantShops'
 import ShopAdd from '@/components/ShopAdd'
+import ShopGoods from '@/components/ShopGoods'
+import GoodsAdd from '@/components/GoodsAdd'
 import Categories from '@/components/Categories'
+import CategoryAdd from '@/components/CategoryAdd'
 import Goods from '@/components/Goods'
 import Users from '@/components/Users'
 
@@ -62,9 +65,24 @@ const router = new Router({
               component: ShopAdd
             },
             {
+              name: 'ShopGoods',
+              path: 'shop_goods/:_id',
+              component: ShopGoods
+            },
+            {
+              name: 'GoodsAdd',
+              path: 'goods_add/:_id',
+              component: GoodsAdd
+            },
+            {
               name: 'Categories',
               path: 'categories',
               component: Categories
+            },
+            {
+              name: 'CategoryAdd',
+              path: 'category_add',
+              component: CategoryAdd
             },
             {
               name: 'Goods',

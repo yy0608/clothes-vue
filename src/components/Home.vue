@@ -72,10 +72,15 @@ export default {
         })
     },
     checkPathHasString (path) {
-      if (/merchant/i.test(path) || /shop_add/i.test(path)) {
+      if (/merchant/i.test(path) || /shop_add/i.test(path) || /shop_goods/i.test(path) || /goods_add/i.test(path)) {
         this.routerData[0].active = true
       } else {
         this.routerData[0].active = false
+      }
+      if (/category_add/i.test(path)) {
+        this.routerData[1].active = true
+      } else {
+        this.routerData[1].active = false
       }
     },
     goIndex (e) {
