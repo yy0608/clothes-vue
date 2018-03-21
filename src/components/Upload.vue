@@ -1,19 +1,35 @@
 <template>
-<div class="upload-temp-cont">
+<div class="upload-resource-cont">
+  <div class="imgs-cont" v-if="fileSrcList.length">
+    <div class="img-item"
+      v-for="(item, index) in fileSrcList"
+      :key="index">
+      <img class="uploader-img"
+        :src="item"
+        @click="showImgView(index)">
+        <i class="el-icon el-icon-circle-close"
+          @click="deleteImg(index)"></i>
+    </div>
+  </div>
+  <template v-if="showView">
+    <image-view
+      :imgArr="fileSrcList"
+      :showImageView="true"
+      :imageIndex="curIndex"
+      @hideImage="hideImageView"></image-view>
+  </template>
   <!-- action="https://upload-z2.qiniup.com" -->
   <el-upload
     class="resource-uploader"
     accept="image/png, image/jpeg"
     :action="origin"
-    :multiple="true"
+    :multiple="multiple"
     :data="uploadData"
     :show-file-list="false"
-    :on-change="handleChange"
-    :before-upload="beforeUpload"
     :on-success="handleSuccess"
+    :before-upload="checkValidImage"
     :on-error="handleError"
     :http-request="uploadRequest">
-      <img v-if="fileList.length" v-for="(item, index) in fileList" :src="URL.createObjectURL(item.raw)" :key="index" class="uploader-img">
       <i class="el-icon-plus uploader-icon"></i>
     </el-upload>
 </div>
@@ -21,6 +37,7 @@
 
 <script>
 import axios from 'axios'
+import imageView from 'vue-imageview'
 import { origin, imgOrigin, qiniuDirname } from '@/config.js'
 import { generateGuid } from '@/utils.js'
 
@@ -34,13 +51,19 @@ export default {
       origin: origin,
       imgUrl: '',
       fileList: [],
-      URL: window.URL
+      URL: window.URL,
+      showView: false,
+      curIndex: 0
     }
   },
   props: {
     dirname: {
       type: String,
       default: 'unspecified'
+    },
+    multiple: {
+      type: Boolean,
+      default: false
     },
     imgOrigin: {
       type: String,
@@ -60,6 +83,18 @@ export default {
   created () {
     // this.getUploadToken()
   },
+  computed: {
+    fileSrcList () {
+      let resArr = []
+      for (let item of this.fileList) {
+        resArr.push(window.URL.createObjectURL(item))
+      }
+      return resArr
+    }
+  },
+  components: {
+    imageView
+  },
   methods: {
     getUploadToken () {
       axios({
@@ -75,30 +110,25 @@ export default {
           console.log(err)
         })
     },
-    handleChange (file, fileList) {
-      // console.log(111, file)
-      // console.log(222, fileList)
-      this.fileList.push(file)
-    },
-    beforeUpload (file) {
+    checkValidImage (file) {
       let isValidImg = file.type === 'image/jpeg' || file.type === 'image/png'
       let isLt2M = file.size / 1024 / 1024 < 2
       if (isValidImg && isLt2M) {
         let extension = file.type === 'image/jpeg' ? '.jpg' : '.png'
         let filename = generateGuid() + extension
         this.uploadData.key = qiniuDirname + '/' + this.dirname + '/' + filename
+        this.fileList.push(file)
       }
 
       if (!isValidImg) {
-        this.$message.error('上传头像图片只能是 JPG 或 PNG 格式!')
+        this.$message.error('只能是 JPG 或 PNG 格式的图片!')
       }
       if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!')
+        this.$message.error('只能是大小不能超过 2MB 的图片!')
       }
       return isValidImg && isLt2M
     },
     handleSuccess (res, file) {
-      console.log(res)
       // this.form.logo = this.uploadData.key
       // this.imgUrl = this.imgOrigin + this.uploadData.key
       this.imgUrl = URL.createObjectURL(file.raw)
@@ -108,18 +138,62 @@ export default {
     handleError (err) {
       this.$message.error('上传文件失败')
       this.onError && this.onError(err)
+    },
+    showImgView (index) {
+      this.showView = true
+      this.curIndex = index
+    },
+    hideImageView () {
+      this.showView = false
+    },
+    deleteImg (index) {
+      this.fileList.splice(index, 1)
     }
   }
 }
 </script>
 
 <style lang="scss">
-.resource-uploader {
+.upload-resource-cont {
   height: 60px;
-   .el-upload {
-    position: relative;
-    overflow: hidden;
+  .imgs-cont {
+    float: left;
+    height: 60px;
   }
+  .img-item {
+    position: relative;
+    float: left;
+    margin-right: 10px;
+    cursor: pointer;
+    cursor: zoom-in;
+    &:hover .el-icon {
+      opacity: 1;
+      pointer-events: initial;
+    }
+    .el-icon {
+      position: absolute;
+      right: -6px;
+      top: -6px;
+      font-size: 20px;
+      z-index: 2;
+      color: red;
+      background-color: #fff;
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+      cursor: pointer;
+    }
+  }
+  .uploader-img {
+    border-radius: 6px;
+    width: 60px;
+    height: 60px;
+  }
+}
+.resource-uploader {
+  float: left;
+  height: 60px;
   .uploader-icon {
     border-radius: 6px;
     cursor: pointer;
@@ -130,16 +204,10 @@ export default {
     height: 60px;
     line-height: 60px;
     text-align: center;
+    box-sizing: border-box;
     &:hover {
       border-color: #409EFF;
     }
-  }
-  .uploader-img {
-    border-radius: 6px;
-    margin-right: 5px;
-    float: left;
-    width: 60px;
-    height: 60px;
   }
 }
 </style>

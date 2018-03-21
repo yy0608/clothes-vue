@@ -1,7 +1,7 @@
 <template>
 <div class="manage-item merchants-manage-cont">
   <title-cont :title="'分类列表 > 添加分类'" :back="true"></title-cont>
-  <upload :dirname="'category_icon'" :onSuccess="handleSuccess" :onError="handleError" :uploadRequest="handleRequest"></upload>
+  <upload :dirname="'category_icon'" :multiple="true" :onSuccess="handleSuccess" :onError="handleError" :uploadRequest="handleRequest"></upload>
   <el-form class="merchant-add-form" :model="form" ref="form" label-width="80px" label-position="left" :rules="rules">
     <el-form-item label="名称" prop="value">
       <el-input v-model="form.value"></el-input>

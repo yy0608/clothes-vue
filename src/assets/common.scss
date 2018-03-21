@@ -25,3 +25,14 @@ a {
 .dx_captcha {
   height: 40px;
 }
+/* 图片预览组件的css */
+#imageView .imageBox li {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  img {
+    pointer-events: none;
+    max-height: 100%;
+    height: auto !important;
+  }
+}
