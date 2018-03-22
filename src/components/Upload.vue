@@ -32,6 +32,7 @@
     :http-request="uploadRequest">
       <i class="el-icon-plus uploader-icon"></i>
     </el-upload>
+  <el-button @click="testUpload">测试上传</el-button>
 </div>
 </template>
 
@@ -148,6 +149,23 @@ export default {
     },
     deleteImg (index) {
       this.fileList.splice(index, 1)
+    },
+    testUpload () {
+      axios({
+        url: origin + '/employ/upload_to_qiniu',
+        method: 'post',
+        data: {
+          fileList: this.fileList,
+          key: this.uploadData.key
+        },
+        withCredentials: true
+      })
+        .then(res => {
+          console.log(res.data)
+        })
+        .catch(err => {
+          console.log(err)
+        })
     }
   }
 }
