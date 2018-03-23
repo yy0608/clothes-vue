@@ -99,7 +99,7 @@ export default {
   methods: {
     getUploadToken () {
       axios({
-        url: origin + '/employ/get_qiniu_upload_token',
+        url: origin + '/qiniu/generate_token',
         method: 'post',
         withCredentials: true
       })
@@ -151,12 +151,15 @@ export default {
       this.fileList.splice(index, 1)
     },
     testUpload () {
+      let formData = new FormData()
+      formData.append('file', this.fileList[0])
+      formData.append('key', this.uploadData.key)
       axios({
-        url: origin + '/employ/upload_to_qiniu',
+        url: origin + '/qiniu/resource_upload',
         method: 'post',
-        data: {
-          fileList: this.fileList,
-          key: this.uploadData.key
+        data: formData,
+        headers: {
+          'Content-type': 'multipart/form-data'
         },
         withCredentials: true
       })
