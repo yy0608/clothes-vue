@@ -14,6 +14,7 @@ import Categories from '@/components/Categories'
 import CategoryAdd from '@/components/CategoryAdd'
 import Goods from '@/components/Goods'
 import Users from '@/components/Users'
+import Images from '@/components/Images'
 
 let ifCheckedLogin = false
 
@@ -93,6 +94,11 @@ const router = new Router({
               name: 'Users',
               path: 'users',
               component: Users
+            },
+            {
+              name: 'Images',
+              path: 'images',
+              component: Images
             }
           ]
         }

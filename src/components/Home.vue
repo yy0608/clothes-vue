@@ -35,6 +35,10 @@ export default {
         {
           path: '/home/users',
           label: '用户管理'
+        },
+        {
+          path: '/home/images',
+          label: '图片管理'
         }
       ]
     }
