@@ -14,8 +14,17 @@
         :src="item"
         @load="imgLoad($event)"
         @click="showImgView(index)">
-        <i class="el-icon el-icon-circle-close"
+        <i
+          class="el-icon el-icon-circle-close"
           @click="deleteImg(index)"></i>
+        <i
+          v-if="index"
+          class="el-icon el-icon-arrow-left"
+          @click="moveImg(index, 'left')"></i>
+        <i
+          v-if="index !== fileSrcList.length - 1"
+          class="el-icon el-icon-arrow-right"
+          @click="moveImg(index, 'right')"></i>
     </div>
   </div>
   <template v-if="showView">
@@ -60,7 +69,7 @@ export default {
       },
       imgUrl: '',
       fileList: [],
-      // fileSrcList: ['http://img.wsweat.cn/logo.png'],
+      // fileSrcList: ['http://img.wsweat.cn/a.jpg', 'http://img.wsweat.cn/logo.png', 'http://img.wsweat.cn/w.jpg'],
       uploadKeyList: [],
       showView: false,
       curIndex: 0
@@ -164,8 +173,22 @@ export default {
     deleteImg (index) {
       this.fileList.splice(index, 1)
     },
+    moveImg (index, direction) {
+      let srcIdx = index
+      let destIdx
+      switch (direction) {
+        case 'left':
+          destIdx = srcIdx - 1
+          break
+        case 'right':
+          destIdx = srcIdx + 1
+          break
+      }
+      // this.fileSrcList.splice(srcIdx, 1, ...this.fileSrcList.splice(destIdx, 1, this.fileSrcList[srcIdx]))
+      this.fileList.splice(srcIdx, 1, ...this.fileList.splice(destIdx, 1, this.fileList[srcIdx]))
+    },
     imgLoad (e) { // 释放内存中的blob url
-      window.URL.revokeObjectURL(e.currentTarget.src)
+      // window.URL.revokeObjectURL(e.currentTarget.src)
     },
     beyondLimit () {
       this.$message.error('文件超出' + this.limit + '个')
@@ -198,17 +221,35 @@ export default {
     }
     .el-icon {
       position: absolute;
-      right: -6px;
-      top: -6px;
-      font-size: 20px;
       z-index: 2;
-      color: red;
-      background-color: #fff;
-      border-radius: 50%;
       opacity: 0;
       pointer-events: none;
       transition: opacity .2s ease;
       cursor: pointer;
+      font-size: 20px;
+    }
+    .el-icon-circle-close {
+      color: red;
+      right: -6px;
+      top: -6px;
+      border-radius: 50%;
+      background-color: #fff;
+    }
+    .el-icon-arrow-left {
+      color: #fff;
+      left: 0;
+      bottom: 0;
+      border-top: 1px solid #fff;
+      border-right: 1px solid #fff;
+      background-color: #409eff;
+    }
+    .el-icon-arrow-right {
+      color: #fff;
+      right: 0;
+      bottom: 0;
+      border-top: 1px solid #fff;
+      border-left: 1px solid #fff;
+      background-color: #409eff;
     }
   }
   .uploader-img {
