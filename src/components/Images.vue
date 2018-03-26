@@ -1,30 +1,29 @@
 <template>
 <div class="images-manage-cont">
   <div class="handle-cont">
-    <el-checkbox
-      v-model="checkAll"
-      :disabled="!imgsList.length"
-      @change="handleCheckAllChange">全选</el-checkbox>
-    <div class="total-cont">当前{{imgsList.length}}个文件</div>
-    <el-button size="mini" @click="deleteImg" :disabled="!imgsList.length">删除</el-button>
-    <el-button size="mini" @click="refresh">刷新</el-button>
-    <el-button size="mini" @click="move">移动</el-button>
-    <el-select size="mini" v-model="prefix" @change="prefixChange" placeholder="请选择图片前缀">
-      <el-option
-        v-for="item in prefixOptions"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value">
-      </el-option>
-    </el-select>
-    <el-select size="mini" v-model="limit" @change="limitChange" placeholder="请选择结果条数">
-      <el-option
-        v-for="item in limitOptions"
-        :key="item"
-        :label="item"
-        :value="item">
-      </el-option>
-    </el-select>
+    <div class="handle-buttons">
+      <el-checkbox
+        v-model="checkAll"
+        :disabled="!imgsList.length"
+        @change="handleCheckAllChange">全选</el-checkbox>
+      <div class="total-cont">当前{{imgsList.length}}个文件</div>
+      <el-button size="mini" @click="deleteImg" :disabled="!imgsList.length">删除</el-button>
+      <el-button size="mini" @click="refresh">刷新</el-button>
+      <el-button size="mini" @click="move" disabled>移动</el-button>
+    </div>
+    <div class="handle-select">
+      <div class="prefix">图片前缀：</div>
+      <el-input class="prefix-input" v-model="prefix" @keyup.enter.native="prefixInput" size="mini"></el-input>
+      <div class="limit">搜索条数：</div>
+      <el-select class="limit-select" size="mini" v-model="limit" @change="limitChange" placeholder="请选择结果条数">
+        <el-option
+          v-for="item in limitOptions"
+          :key="item"
+          :label="item"
+          :value="item">
+        </el-option>
+      </el-select>
+    </div>
   </div>
   <el-checkbox-group
     v-if="imgsList.length"
@@ -63,14 +62,7 @@ export default {
       marker: '',
       limit: window.localStorage.qiniuImgLimit || 10,
       prefix: window.localStorage.qiniuImgPrefix || '',
-      limitOptions: [10, 20, 30, 100],
-      prefixOptions: [{
-        label: '全部',
-        value: ''
-      }, {
-        label: '暂存cache/',
-        value: 'cache/'
-      }]
+      limitOptions: [10, 20, 30, 100]
     }
   },
   computed: {
@@ -122,6 +114,9 @@ export default {
           } else {
             this.imgsList = this.imgsList.concat(res.data.data)
           }
+          this.imgsList.sort((a, b) => {
+            return b.putTime - a.putTime
+          })
           this.marker = res.data.nextMarker
         })
         .catch(err => {
@@ -177,10 +172,9 @@ export default {
       this.limit = val
       this.refresh()
     },
-    prefixChange (val) {
-      window.localStorage.qiniuImgPrefix = val
-      this.prefix = val
+    prefixInput () {
       this.refresh()
+      window.localStorage.qiniuImgPrefix = this.prefix
     },
     loadMore () {
       this.getImgsList()
@@ -195,8 +189,27 @@ export default {
     display: flex;
     padding: 10px;
     align-items: center;
+    display: flex;
+    justify-content: space-between;
+    .handle-buttons {
+      display: flex;
+      align-items: center;
+    }
+    .handle-select {
+      display: flex;
+      align-items: center;
+    }
     .total-cont {
       margin: 0 10px;
+    }
+    .limit {
+      margin-left: 10px;
+    }
+    .prefix-input {
+      width: 100px;
+    }
+    .limit-select {
+      width: 100px;
     }
   }
   .imgs-cont {
