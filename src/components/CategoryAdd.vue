@@ -1,7 +1,6 @@
 <template>
 <div class="manage-item merchants-manage-cont">
   <title-cont :title="'分类列表 > 添加分类'" :back="true"></title-cont>
-  <upload :dirname="'category_icon'" :multiple="true" :onSuccess="handleSuccess" :onError="handleError" :measure="'100px'"></upload>
   <el-form class="merchant-add-form" :model="form" ref="form" label-width="80px" label-position="left" :rules="rules">
     <el-form-item label="名称" prop="value">
       <el-input v-model="form.value"></el-input>
@@ -36,6 +35,7 @@ export default {
       //     value: 'sss',
       //     children: [{
       //       label: 'ggg',
+      //       logo: 'http://www.sss.com/',
       //       value: '222'
       //     }]
       //   }]
@@ -71,12 +71,6 @@ export default {
         .catch(err => {
           console.log(err)
         })
-    },
-    handleSuccess (data) {
-      console.log(data)
-    },
-    handleError (err) {
-      console.log(err)
     }
   }
 }

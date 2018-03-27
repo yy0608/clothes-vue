@@ -1,19 +1,19 @@
 <template>
 <div
   :class="[multiple ? '' : 'single', 'upload-resource-cont']"
-  :style="{minHeight: measure}">
-  <div class="imgs-cont" v-if="fileSrcList.length">
+  :style="{minHeight: measure, minWidth: measure}">
+  <div class="imgs-cont" v-if="keySrcList.length">
     <div class="img-item"
-      v-for="(item, index) in fileSrcList"
-      v-if="multiple || index === fileSrcList.length - 1"
-      :style="{height: measure}"
+      v-for="(item, index) in keySrcList"
+      v-if="multiple || index === keySrcList.length - 1"
+      :style="{width: measure, height: measure}"
       :key="index">
-      <img
-        class="uploader-img"
-        :style="{width: measure}"
-        :src="item"
-        @load="imgLoad($event)"
-        @click="showImgView(index)">
+      <div class="img-cont">
+        <img
+          :src="item + '?imageView2/2/w/' + parseInt(measure) + '/h/' + parseInt(measure)"
+          @error="imgError($event)"
+          @click="showImgView(index)">
+      </div>
         <i
           class="el-icon el-icon-circle-close"
           @click="deleteImg(index)"></i>
@@ -22,19 +22,18 @@
           class="el-icon el-icon-arrow-left"
           @click="moveImg(index, 'left')"></i>
         <i
-          v-if="index !== fileSrcList.length - 1"
+          v-if="index !== keySrcList.length - 1"
           class="el-icon el-icon-arrow-right"
           @click="moveImg(index, 'right')"></i>
     </div>
   </div>
   <template v-if="showView">
     <image-view
-      :imgArr="fileSrcList"
+      :imgArr="keySrcList"
       :showImageView="true"
       :imageIndex="curIndex"
       @hideImage="hideImageView"></image-view>
   </template>
-  <!--  -->
   <el-upload
     class="resource-uploader"
     action="https://upload-z2.qiniup.com"
@@ -49,7 +48,7 @@
     :on-exceed="beyondLimit"
     :on-error="handleError">
       <i
-        :class="[fileSrcList.length && !multiple ? 'hide' : '', 'el-icon-plus uploader-icon']"
+        :class="[keySrcList.length && !multiple ? 'hide' : '', 'el-icon-plus uploader-icon']"
         :style="{lineHeight: measure}"></i>
     </el-upload>
 </div>
@@ -57,7 +56,7 @@
 
 <script>
 import imageView from 'vue-imageview'
-import { qiniuDirname } from '@/config.js'
+import { imgOrigin, qiniuDefaultDirname, errorImgKey } from '@/config.js'
 import { generateGuid, getQiniuToken, getQiniuTokenRequest } from '@/utils.js'
 
 export default {
@@ -68,17 +67,22 @@ export default {
         token: ''
       },
       imgUrl: '',
-      fileList: [],
-      // fileSrcList: ['http://img.wsweat.cn/a.jpg', 'http://img.wsweat.cn/logo.png', 'http://img.wsweat.cn/w.jpg'],
-      uploadKeyList: [],
       showView: false,
-      curIndex: 0
+      curIndex: 0,
+      uploadKeyList: []
     }
   },
   props: {
     dirname: {
       type: String,
       default: 'unspecified'
+    },
+    defaultKeyList: {
+      type: Array,
+      default: () => {
+        return []
+        // return ['a.jpg', 'cache/category_icon/6e933fc6-ca09-4992-8658-de248dce36cc.png', 'cache/category_icon/50ae16c1-0fc7-4983-b58c-0c4de8322175.png', 'logo.png', 'w.jpg']
+      }
     },
     multiple: {
       type: Boolean,
@@ -100,14 +104,14 @@ export default {
     }
   },
   created () {
+    this.uploadKeyList = [ ...this.defaultKeyList ]
     this.getUploadToken()
   },
   computed: {
-    fileSrcList () {
+    keySrcList () {
       let resArr = []
-      for (let item of this.fileList) {
-        // resArr.push(window.URL.createObjectURL(item))
-        resArr.push(window.URL.createObjectURL(item.raw))
+      for (let item of this.uploadKeyList) {
+        resArr.push(imgOrigin + item)
       }
       return resArr
     }
@@ -140,7 +144,7 @@ export default {
       if (isValidImg && isLt2M) {
         let extension = file.type === 'image/jpeg' ? '.jpg' : '.png'
         let filename = generateGuid() + extension
-        this.uploadData.key = qiniuDirname + '/' + this.dirname + '/' + filename
+        this.uploadData.key = qiniuDefaultDirname + '/' + this.dirname + '/' + filename
       }
 
       if (!isValidImg) {
@@ -152,16 +156,17 @@ export default {
       return isValidImg && isLt2M
     },
     handleSuccess (res, file) {
-      this.fileList.push(file)
-      this.uploadKeyList.push(res.key)
-      this.onSuccess && this.onSuccess({
-        key: res.key,
-        keyList: this.uploadKeyList
-      })
+      if (this.multiple) {
+        this.uploadKeyList.push(res.key)
+      } else {
+        this.uploadKeyList = [res.key]
+      }
+      console.log(this.uploadKeyList)
+      this.onSuccess && this.onSuccess(this.uploadKeyList)
     },
     handleError (err, file) {
       this.$message.error('上传文件失败')
-      this.onError && this.onError(err)
+      this.onError && this.onError(err, file)
     },
     showImgView (index) {
       this.showView = true
@@ -171,7 +176,12 @@ export default {
       this.showView = false
     },
     deleteImg (index) {
-      this.fileList.splice(index, 1)
+      this.uploadKeyList.splice(index, 1)
+    },
+    imgError (e) {
+      this.$message.error('图片加载失败')
+      let qiniuImgParam = e.currentTarget.src.split('?')[1]
+      e.currentTarget.src = imgOrigin + errorImgKey + '?' + qiniuImgParam
     },
     moveImg (index, direction) {
       let srcIdx = index
@@ -184,11 +194,7 @@ export default {
           destIdx = srcIdx + 1
           break
       }
-      // this.fileSrcList.splice(srcIdx, 1, ...this.fileSrcList.splice(destIdx, 1, this.fileSrcList[srcIdx]))
-      this.fileList.splice(srcIdx, 1, ...this.fileList.splice(destIdx, 1, this.fileList[srcIdx]))
-    },
-    imgLoad (e) { // 释放内存中的blob url
-      // window.URL.revokeObjectURL(e.currentTarget.src)
+      this.uploadKeyList.splice(srcIdx, 1, ...this.uploadKeyList.splice(destIdx, 1, this.uploadKeyList[srcIdx]))
     },
     beyondLimit () {
       this.$message.error('文件超出' + this.limit + '个')
@@ -252,10 +258,15 @@ export default {
       background-color: #409eff;
     }
   }
-  .uploader-img {
-    border-radius: 6px;
-    // width: 60px;
+  .img-cont {
+    width: 100%;
     height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: #f5f5f5;
   }
 }
 .resource-uploader {

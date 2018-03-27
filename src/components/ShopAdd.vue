@@ -9,16 +9,7 @@
       <el-input type="textarea" resize="none" v-model="form.desc"></el-input>
     </el-form-item>
     <el-form-item class="upload-form-item" label="logo" prop="logo">
-      <el-upload
-        class="logo-uploader"
-        action="https://upload-z2.qiniup.com"
-        :data="uploadData"
-        :show-file-list="false"
-        :on-success="handleLogoSuccess"
-        :before-upload="beforeLogoUpload">
-          <img v-if="form.logo" :src="imgUrl" class="logo">
-          <i v-else class="el-icon-plus logo-uploader-icon"></i>
-        </el-upload>
+      <upload :multiple="false" :onSuccess="uploadSuccess" :onError="uploadError" :dirname="'icon_test'" :measure="'60px'" ref="upload"></upload>
       <el-input type="textarea" resize="none" v-model="form.logo" @change="inputLogoUrl"></el-input>
     </el-form-item>
     <el-form-item label="地址" prop="address">
@@ -48,8 +39,8 @@ import axios from 'axios'
 import { origin, imgOrigin } from '@/config.js'
 import { parseDate } from '@/utils.js'
 import TitleCont from './TitleCont.vue'
+import Upload from './Upload.vue'
 import { mapState } from 'vuex'
-import md5 from 'js-md5'
 
 export default {
   data () {
@@ -106,21 +97,8 @@ export default {
     'userInfo'
   ]),
   components: {
-    TitleCont
-  },
-  created () {
-    axios({
-      url: origin + '/employ/get_qiniu_upload_token',
-      method: 'post',
-      withCredentials: true
-    })
-      .then(res => {
-        this.uploadData.token = res.data.data
-      })
-      .catch(err => {
-        this.$message.error('获取七牛上传文件的token失败')
-        console.log(err)
-      })
+    TitleCont,
+    Upload
   },
   methods: {
     submit () {
@@ -165,28 +143,15 @@ export default {
       })
     },
     inputLogoUrl () {
-      this.imgUrl = this.form.logo
+      let key = this.form.logo.replace(imgOrigin, '')
+      this.$refs.upload.uploadKeyList = [ key ]
     },
-    handleLogoSuccess (res, file) {
-      this.form.logo = this.uploadData.key
-      this.imgUrl = imgOrigin + this.form.logo
+    uploadSuccess (keyList) {
+      let src = imgOrigin + keyList[0]
+      this.form.logo = src
     },
-    beforeLogoUpload (file) {
-      let isValidImg = file.type === 'image/jpeg' || file.type === 'image/png'
-      let isLt2M = file.size / 1024 / 1024 < 2
-      if (isValidImg && isLt2M) {
-        let extension = file.type === 'image/jpeg' ? '.jpg' : '.png'
-        let filename = md5(Date.now() + this.$route.params._id + Math.random()) + extension
-        this.uploadData.key = 'shop_logo/' + filename
-      }
-
-      if (!isValidImg) {
-        this.$message.error('上传头像图片只能是 JPG 或 PNG 格式!')
-      }
-      if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!')
-      }
-      return isValidImg && isLt2M
+    uploadError (err, file) {
+      console.log(err, file)
     }
   }
 }

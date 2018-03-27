@@ -30,14 +30,16 @@
     v-model="checkedList"
     @change="handleCheckedChange">
     <div class="imgs-cont">
-        <div v-for="(item, index) in imgsList" :key="index" class="img-item">
+      <el-tooltip :open-delay="1000" v-for="(item, index) in imgsList" :key="index" :content="item.key" effect="light">
+        <div class="img-item">
           <el-checkbox :key="item.key" :label="item.key"></el-checkbox>
           <div class="img-cont">
             <img :src="imgOrigin + item.key + '?imageView2/2/w/150/h/150'">
           </div>
-          <div class="size">{{item.key.split('/')[0]}}&nbsp;&nbsp;&nbsp;{{parseFloat(item.fsize / 1024).toFixed(2)}}kb</div>
+          <div class="size">{{item.key.split('/')[0]}}&nbsp;&nbsp;{{Math.round(item.fsize / 1024)}}k&nbsp;&nbsp;&nbsp;<span class="copy" @click="copy" :data-clipboard-text="imgOrigin + item.key">copy</span></div>
           <div class="time">{{parseDate(item.putTime / 10000, false)}}</div>
         </div>
+      </el-tooltip>
     </div>
   </el-checkbox-group>
   <div class="no-data" v-if="!imgsList.length">暂无数据</div>
@@ -49,6 +51,7 @@
 import axios from 'axios'
 import { origin, imgOrigin } from '@/config.js'
 import { parseDate } from '@/utils.js'
+import Clipboard from 'clipboard'
 
 export default {
   data () {
@@ -134,7 +137,6 @@ export default {
     deleteImg () {
       this.$confirm('确认删除？', '提示')
         .then(() => {
-          console.log(this.checkedList)
           axios({
             url: origin + '/qiniu/resource_delete_batch',
             method: 'post',
@@ -178,6 +180,21 @@ export default {
     },
     loadMore () {
       this.getImgsList()
+    },
+    copy () {
+      let clipboard = new Clipboard('.copy')
+
+      clipboard.on('success', e => {
+        this.$message.success('复制图片路径成功')
+        e.clearSelection()
+        clipboard.destroy()
+      })
+
+      clipboard.on('error', e => {
+        this.$message.error('复制图片路径失败')
+        console.error('Action:', e.action)
+        clipboard.destroy()
+      })
     }
   }
 }
@@ -223,12 +240,16 @@ export default {
       padding: 10px;
       margin: 10px;
       font-size: 16px;
+      transition: box-shadow .2s ease;
+      &:hover {
+        box-shadow: 0 0 25px rgba(0, 0, 0, .1);
+      }
       .el-checkbox {
         position: absolute;
-        left: 0;
+        right: 0;
         top: 0;
-        width: 100%;
-        height: 100%;
+        width: 40px;
+        height: 40px;
       }
       .el-checkbox__input {
         position: absolute;
@@ -248,7 +269,12 @@ export default {
         height: 150px;
       }
       .size, .time {
-        margin: 5px 0;
+        font-size: 14px;
+        margin: 3px 0;
+      }
+      .copy {
+        cursor: pointer;
+        color: #409eff;
       }
     }
   }
