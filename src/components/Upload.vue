@@ -90,7 +90,7 @@ export default {
     },
     limit: {
       type: Number,
-      default: 6
+      default: 20
     },
     measure: {
       type: String,
@@ -161,7 +161,6 @@ export default {
       } else {
         this.uploadKeyList = [res.key]
       }
-      console.log(this.uploadKeyList)
       this.onSuccess && this.onSuccess(this.uploadKeyList)
     },
     handleError (err, file) {

@@ -1,8 +1,11 @@
 <template>
 <div class="manage-item category-add-manage-cont">
   <title-cont :title="'分类列表 > 添加分类'" :back="true"></title-cont>
-  <el-form class="merchant-add-form" :model="form" ref="form" label-width="80px" label-position="left" :rules="rules" :validate-on-rule-change="false">
-    <el-form-item label="上级分类" prop="parent" placeholder="不选则为一级分类">
+  <el-form class="merchant-add-form" :model="form" ref="form" label-width="80px" label-position="left" :rules="rules">
+    <el-form-item label="名称" prop="label">
+      <el-input v-model="form.label"></el-input>
+    </el-form-item>
+    <el-form-item label="上级分类" prop="parent">
       <el-cascader
         clearable
         change-on-select
@@ -11,15 +14,6 @@
         :options="goodsCategories"
       ></el-cascader>
     </el-form-item>
-    <el-form-item label="名称" prop="name">
-      <el-input v-model="form.name"></el-input>
-    </el-form-item>
-    <el-form-item label="描述" prop="desc">
-      <el-input v-model="form.desc"></el-input>
-    </el-form-item>
-    <!-- <el-form-item label="上级" prop="parent">
-      <el-input v-model="form.parent"></el-input>
-    </el-form-item> -->
     <el-form-item v-if="iconInputShow" label="图标" prop="icon">
       <el-input v-model="form.icon"></el-input>
     </el-form-item>
@@ -35,28 +29,22 @@ import axios from 'axios'
 import { origin } from '@/config.js'
 import TitleCont from './TitleCont.vue'
 import Upload from './Upload.vue'
-import { formatCategoriesForCascader } from '@/utils.js'
+import { generateGuid } from '@/utils.js'
 
 export default {
   data () {
     return {
       goodsCategories: [],
-      validLevel: 2,
       form: {
-        name: '',
-        desc: '',
+        label: '',
         parent: [],
         icon: ''
       },
       iconInputShow: false,
       rules: {
-        name: [{
+        label: [{
           required: true,
           message: '输入分类名称'
-        }],
-        desc: [{
-          required: true,
-          message: '输入分类描述'
         }]
       }
     }
@@ -79,42 +67,48 @@ export default {
           if (!res.data.success) {
             return this.$message.error('获取分类列表失败')
           }
-          this.goodsCategories = formatCategoriesForCascader(res.data.data, true)
+          this.goodsCategories = res.data.data
         })
         .catch(err => {
           console.log(err)
         })
     },
-    handleChange (val) {
-      if (val.length >= this.validLevel) {
-        this.iconInputShow = true
-        this.rules = {
-          name: [{
-            required: true,
-            message: '输入分类名称'
-          }],
-          desc: [{
-            required: true,
-            message: '输入分类描述'
-          }],
-          icon: [{
-            required: true,
-            message: '上传icon或输入地址'
-          }]
-        }
-      } else {
-        this.iconInputShow = false
-        this.rules = {
-          name: [{
-            required: true,
-            message: '输入分类名称'
-          }],
-          desc: [{
-            required: true,
-            message: '输入分类描述'
-          }]
-        }
+    handleChange (value) {
+      // this.form.parent = value
+      switch (value.length) {
+        case 0:
+          this.iconInputShow = false
+          this.rules = {
+            label: [{
+              required: true,
+              message: '输入分类名称'
+            }]
+          }
+          break
+        case 1:
+          this.iconInputShow = false
+          this.rules = {
+            label: [{
+              required: true,
+              message: '输入分类名称'
+            }]
+          }
+          break
+        case 2:
+          this.iconInputShow = true
+          this.rules = {
+            label: [{
+              required: true,
+              message: '输入分类名称'
+            }],
+            icon: [{
+              required: true,
+              message: '上传icon或输入地址'
+            }]
+          }
+          break
       }
+      console.log(this.form.parent)
     },
     submit () {
       this.$refs.form.validate(bool => {
@@ -123,21 +117,16 @@ export default {
           this.$message('填写出错')
           return
         }
-        let data = this.form.icon ? {
-          name: this.form.name,
-          desc: this.form.desc,
-          parent: this.form.parent,
-          icon: this.form.icon
-        } : {
-          name: this.form.name,
-          desc: this.form.desc,
-          parent: this.form.parent
-        }
         axios({
           url: origin + '/employ/category_add',
           withCredentials: true,
           method: 'post',
-          data: data
+          data: {
+            value: generateGuid(),
+            parent: this.form.parent,
+            label: this.form.label,
+            icon: this.form.icon
+          }
         })
           .then(res => {
             if (res.data.success) {
@@ -159,11 +148,13 @@ export default {
 </script>
 
 <style lang="scss">
-.merchant-add-form {
-  padding: 20px;
-  width: 500px;
-  .el-cascader {
-    width: 100%;
+.category-add-manage-cont {
+  .el-form {
+    padding: 20px;
+    width: 500px;
+    .el-cascader {
+      width: 100%;
+    }
   }
 }
 </style>

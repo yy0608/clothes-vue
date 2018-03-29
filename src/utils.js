@@ -67,3 +67,35 @@ export const getQiniuTokenRequest = (data) => { // 从服务器获取token
       })
   })
 }
+
+export const formatCategoriesForCascader = (data, lastDisabled) => { // 请求到的分类列表处理为多级列表数据，lastDisabled区分是否最后类别禁用
+  let resData = []
+  for (let item of data) {
+    resData.push({
+      value: item._id,
+      label: item.name,
+      disabled: lastDisabled === undefined ? false : item.level > 2, // 多于2级不可选
+      parent_id: item.parent_id
+    })
+  }
+  let resArr = []
+  for (let item of resData) {
+    if (!item.parent_id) {
+      resArr.push(item)
+      item.children = []
+      for (let item2 of resData) {
+        if (item2.parent_id === item.value) {
+          item.children.push(item2)
+          item2.children = []
+          for (let item3 of resData) {
+            if (item3.parent_id === item2.value) {
+              item2.children.push(item3)
+            }
+          }
+        }
+      }
+    }
+  }
+  resData = null
+  return resArr
+}
