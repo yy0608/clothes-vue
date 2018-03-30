@@ -164,6 +164,7 @@ export default {
         })
     },
     refresh () {
+      this.checkAll = false
       this.refreshFlag = true
       this.marker = ''
       this.checkedList = []

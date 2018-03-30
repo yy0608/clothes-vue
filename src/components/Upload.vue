@@ -94,7 +94,7 @@ export default {
     },
     measure: {
       type: String,
-      default: '100px'
+      default: '95px'
     },
     onSuccess: {
       type: Function
@@ -220,6 +220,7 @@ export default {
     margin-right: 10px;
     cursor: pointer;
     cursor: zoom-in;
+    margin-bottom: 10px;
     &:hover .el-icon {
       opacity: 1;
       pointer-events: initial;

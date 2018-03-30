@@ -119,7 +119,6 @@ export default {
     submit () {
       this.$refs.form.validate(bool => {
         if (!bool) {
-          console.log(this.form)
           this.$message('填写出错')
           return
         }

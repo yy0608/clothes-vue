@@ -6,21 +6,20 @@
       <el-cascader
         clearable
         v-model="form.category"
-        @change="handleChange"
         :options="goodsCategories"
       ></el-cascader>
     </el-form-item>
     <el-form-item label="名称" prop="title">
       <el-input v-model="form.title"></el-input>
     </el-form-item>
-    <el-form-item label="描述" prop="desc">
-      <el-input v-model="form.desc"></el-input>
-    </el-form-item>
-    <el-form-item label="轮播图片" prop="figure_imgs">
-      <upload :multiple="true" :dirname="'goods'" :onSuccess="uploadSuccess" :onError="uploadError"></upload>
-    </el-form-item>
     <el-form-item label="大概价格" prop="valuation">
       <el-input type="number" v-model.number="form.valuation"></el-input>
+    </el-form-item>
+    <el-form-item label="轮播图片" prop="figure_imgs">
+      <upload :multiple="true" ref="figureUpload" :dirname="'goods/figure'" :onSuccess="uploadFigureSuccess"></upload>
+    </el-form-item>
+    <el-form-item label="内容详情" prop="detail_imgs">
+      <upload :multiple="true" ref="detailUpload" :dirname="'goods/detail'" :onSuccess="uploadDetailSuccess"></upload>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="submit">添加</el-button>
@@ -40,22 +39,18 @@ export default {
   data () {
     return {
       goodsCategories: [],
+      shop_id: this.$route.params && this.$route.params._id,
       form: {
         title: '',
-        desc: '',
         category: [],
         valuation: '',
-        figure_imgs: []
-        // detail_imgs: []
+        figure_imgs: [],
+        detail_imgs: []
       },
       rules: {
         title: [{
           required: true,
           message: '输入商品标题'
-        }],
-        desc: [{
-          required: true,
-          message: '输入商品描述'
         }],
         category: [{
           required: true,
@@ -68,6 +63,10 @@ export default {
         figure_imgs: [{
           required: true,
           message: '上传轮播图片'
+        }],
+        detail_imgs: [{
+          required: true,
+          message: '上传详情图片'
         }]
       }
     }
@@ -77,6 +76,7 @@ export default {
     Upload
   },
   created () {
+    console.log(this.shop_id)
     this.getGoodsCategories()
   },
   methods: {
@@ -96,26 +96,24 @@ export default {
           console.log(err)
         })
     },
-    handleChange (val) {},
-    uploadSuccess (val) {
-      console.log(val)
+    uploadFigureSuccess (val) {
+      this.form.figure_imgs = val
     },
-    uploadError (err) {
-      console.log(err)
+    uploadDetailSuccess (val) {
+      this.form.detail_imgs = val
     },
     submit () {
       this.$refs.form.validate(bool => {
         if (!bool) {
-          console.log(this.form)
-          this.$message('填写出错')
-          return
+          return this.$message.error('填写出错')
         }
         let data = {
+          shop_id: this.shop_id,
           title: this.form.title,
-          desc: this.form.desc,
           category_id: this.form.category[this.form.category.length - 1],
-          valuation: this.form.valuation,
-          figure_imgs: this.form.figure_imgs
+          valuation: this.form.valuation * 100,
+          figure_imgs: this.form.figure_imgs,
+          detail_imgs: this.form.detail_imgs
         }
         axios({
           url: origin + '/employ/goods_add',
@@ -123,7 +121,21 @@ export default {
           withCredentials: true,
           data: data
         })
-        console.log(this.form)
+          .then(res => {
+            console.log(res.data)
+            if (res.data.success) {
+              this.$message.success(res.data.msg)
+              this.$refs.form.resetFields()
+              this.$refs.figureUpload.uploadKeyList = []
+              this.$refs.detailUpload.uploadKeyList = []
+            } else {
+              this.$message.error(res.data.msg)
+            }
+          })
+          .catch(err => {
+            console.log(err)
+            this.$message.error('请求出错')
+          })
       })
     }
   }
