@@ -2,6 +2,13 @@
 <div class="manage-item merchants-manage-cont">
   <title-cont :title="'商家列表'" :buttons="[{label: '添加商家', func: goAdd}]"></title-cont>
   <el-table :data="merchantList">
+    <el-table-column label="_id">
+      <template slot-scope="props">
+        <copy :content="props.row._id">
+          <div>复制</div>
+        </copy>
+      </template>
+    </el-table-column>
     <el-table-column prop="phone" label="手机"></el-table-column>
     <el-table-column prop="name" label="名称"></el-table-column>
     <el-table-column prop="manager" label="联系人"></el-table-column>
@@ -21,12 +28,14 @@
 <script>
 import TitleCont from './TitleCont.vue'
 import Pagination from './Pagination.vue'
+import Copy from './Copy.vue'
 import { mapState } from 'vuex'
 
 export default {
   components: {
     TitleCont,
-    Pagination
+    Pagination,
+    Copy
   },
   computed: mapState([
     'merchantList',

@@ -30,7 +30,7 @@
     v-model="checkedList"
     @change="handleCheckedChange">
     <div class="imgs-cont">
-      <el-tooltip :open-delay="1000" v-for="(item, index) in imgsList" :key="index" :content="item.key" effect="light">
+      <el-tooltip :open-delay="1000" v-for="(item, index) in imgsList" :key="index" placement="top" :content="item.key" effect="light">
         <div class="img-item">
           <el-checkbox :key="item.key" :label="item.key"></el-checkbox>
           <div class="img-cont">
