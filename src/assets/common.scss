@@ -13,6 +13,9 @@ a {
   text-decoration: none;
   color: #333;
 }
+div:focus {
+  outline: 0;
+}
 .bf {
   background-color: #fff;
 }
