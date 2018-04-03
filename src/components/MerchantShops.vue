@@ -13,7 +13,8 @@
     <el-table-column prop="logo" label="logo">
       <template slot-scope="props">
         <copy :content="props.row.logo">
-          <img :src="props.row.logo" width="60" height="60" :alt="props.row.desc">
+          <emage :src="/(http:\/\/)|(https:\/\/)/.test(props.row.logo) ? props.row.logo : imgOrigin + props.row.logo + '?imageView2/2/w/60/h/60'" :width="60" :height="60"></emage>
+          <!-- <img :src="/(http:\/\/)|(https:\/\/)/.test(props.row.logo) ? props.row.logo : imgOrigin + props.row.logo + '?imageView2/2/w/60/h/60'" width="60" height="60" :alt="props.row.desc"> -->
         </copy>
       </template>
     </el-table-column>
@@ -23,7 +24,7 @@
       <template slot-scope="props">
         <el-button size="mini" @click="goGoods(props.row._id)">商品</el-button>
         <el-button size="mini" @click="editCategory(props.row._id)">编辑</el-button>
-        <el-button size="mini" @click="deleteCategory(props.$index, props.row._id)">删除</el-button>
+        <el-button size="mini" disabled @click="deleteCategory(props.$index, props.row._id)">删除</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -36,12 +37,18 @@ import TitleCont from './TitleCont.vue'
 import Pagination from './Pagination.vue'
 import Copy from './Copy.vue'
 import { mapState } from 'vuex'
+import { imgOrigin } from '@/config.js'
 
 export default {
   computed: mapState([
     'shopList',
     'shopsCount'
   ]),
+  data () {
+    return {
+      imgOrigin: imgOrigin
+    }
+  },
   components: {
     TitleCont,
     Pagination,
@@ -80,7 +87,14 @@ export default {
     pageChange () {
       this.getShopList()
     },
-    editCategory (_id) {},
+    editCategory (_id) {
+      this.$router.push({
+        path: '/home/shop_add/' + _id,
+        query: {
+          shop_id: _id
+        }
+      })
+    },
     deleteCategory (index, _id) {}
   }
 }

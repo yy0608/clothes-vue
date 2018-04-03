@@ -24,7 +24,7 @@
       <el-input v-model="form.icon"></el-input>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="submit">添加</el-button>
+      <el-button type="primary" @click="submit">{{ category_id ? '确认添加' : '确认修改' }}</el-button>
     </el-form-item>
   </el-form>
 </div>
@@ -35,13 +35,16 @@ import axios from 'axios'
 import { origin } from '@/config.js'
 import TitleCont from './TitleCont.vue'
 import Upload from './Upload.vue'
-import { formatCategoriesForCascader } from '@/utils.js'
+import { formatCategoriesForCascader, formatCategoryForDefaultValue } from '@/utils.js'
 
 export default {
   data () {
     return {
+      serverCategories: [],
       goodsCategories: [],
+      defaultCategory: [],
       validLevel: 2,
+      category_id: this.$route.query._id,
       form: {
         name: '',
         desc: '',
@@ -67,6 +70,28 @@ export default {
   },
   created () {
     this.getGoodsCategories()
+    if (this.category_id) {
+      axios({
+        url: origin + '/employ/category_detail',
+        method: 'get',
+        withCredentials: true,
+        params: { _id: this.category_id }
+      })
+        .then(res => {
+          if (!res.data.success) {
+            return this.$message.error(res.data.msg)
+          }
+          if (res.data.data.level === 3) {
+            this.iconInputShow = true
+          }
+          this.form = res.data.data
+          this.defaultCategory = formatCategoryForDefaultValue(res.data.data, this.serverCategories)
+          this.form.parent = [ ...this.defaultCategory ]
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    }
   },
   methods: {
     getGoodsCategories () {
@@ -79,6 +104,7 @@ export default {
           if (!res.data.success) {
             return this.$message.error('获取分类列表失败')
           }
+          this.serverCategories = res.data.data
           this.goodsCategories = formatCategoriesForCascader(res.data.data, true)
         })
         .catch(err => {

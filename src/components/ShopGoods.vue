@@ -52,7 +52,7 @@ export default {
         params: { shop_id: this.shop_id }
       })
         .then(res => {
-          console.log(res.data.data[0])
+          // console.log(res.data.data[0])
           this.shopGoods = res.data.data
         })
         .catch(err => {

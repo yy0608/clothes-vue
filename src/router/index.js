@@ -122,7 +122,10 @@ function goDiffPath (to, next, store) {
         }
       })
     } else {
-      return next({ path: to.path })
+      return next({
+        path: to.path,
+        query: to.query
+      })
     }
   }
 }

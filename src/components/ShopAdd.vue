@@ -9,14 +9,22 @@
       <el-input type="textarea" resize="none" v-model="form.desc"></el-input>
     </el-form-item>
     <el-form-item class="upload-form-item" label="logo" prop="logo">
-      <upload :multiple="false" :onSuccess="uploadSuccess" :onError="uploadError" :dirname="'icon_test'" :measure="'60px'" ref="upload"></upload>
+      <upload
+        :multiple="false"
+        :onSuccess="uploadSuccess"
+        :onError="uploadError"
+        :dirname="'logo'"
+        :measure="'60px'"
+        :defaultKeyList="defaultKeyList"
+        ref="upload"></upload>
       <el-input type="textarea" resize="none" v-model="form.logo" @change="inputLogoUrl"></el-input>
     </el-form-item>
     <el-form-item label="地址" prop="address">
       <el-input v-model="form.address"></el-input>
     </el-form-item>
-    <el-form-item label="经纬度坐标" prop="location">
+    <el-form-item label="经纬度坐标" prop="location" class="location-form-item">
       <el-input v-model="form.location" placeholder="类似114.001432,22.681253"></el-input>
+      <a href="http://api.map.baidu.com/lbsapi/getpoint/index.html" target="blank" class="get-location">坐标获取</a>
     </el-form-item>
     <el-form-item label="负责人" prop="manager">
       <el-input v-model="form.manager"></el-input>
@@ -28,7 +36,7 @@
       <el-input type="textarea" resize="none" v-model="form.remark" placeholder="填写微信qq或其他信息"></el-input>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="submit">添加</el-button>
+      <el-button type="primary" @click="submit">{{shop_id ? '确认修改' : '确认添加'}}</el-button>
     </el-form-item>
   </el-form>
 </div>
@@ -50,7 +58,9 @@ export default {
         token: ''
       },
       imgUrl: '',
+      shop_id: this.$route.query.shop_id,
       parseDate: parseDate,
+      defaultKeyList: [],
       form: {
         name: '',
         desc: '',
@@ -96,6 +106,37 @@ export default {
   computed: mapState([
     'userInfo'
   ]),
+  created () {
+    if (this.shop_id) {
+      axios({
+        url: origin + '/employ/shop_detail',
+        method: 'get',
+        params: { shop_id: this.shop_id },
+        withCredentials: true
+      })
+        .then(res => {
+          if (!res.data.success) {
+            return this.$message.error(res.data.msg)
+          }
+          // console.log(res.data.data)
+          this.origin_logo = res.data.data.logo
+          let logo = /(http:\/\/)|(https:\/\/)/.test(res.data.data.logo) ? res.data.data.logo : imgOrigin + res.data.data.logo
+          this.form = {
+            ...res.data.data,
+            location: res.data.data.location.join(','),
+            logo
+          }
+          let key = logo.replace(imgOrigin, '')
+          this.$refs.upload.uploadKeyList = [ key ]
+          // this.defaultKeyList = [ logo ]
+          console.log(this.form)
+        })
+        .catch(err => {
+          console.log(err)
+          this.$message.error('请求出错')
+        })
+    }
+  },
   components: {
     TitleCont,
     Upload
@@ -108,11 +149,31 @@ export default {
           return
         }
         let _id = this.$route.params._id
-        var data = Object.assign({}, this.form, {
-          merchant_id: _id
-        })
+        let url = this.shop_id ? origin + '/employ/shop_edit' : origin + '/employ/shop_add'
+        let data = null
+        let logo = this.form.logo.split(imgOrigin)[this.form.logo.split(imgOrigin).length - 1]
+        if (this.shop_id) {
+          data = {
+            ...this.form,
+            logo
+          }
+          delete data.created_ts
+          delete data.createdAt
+          delete data.updatedAt
+          delete data.merchant_id
+          if (logo === this.origin_logo) {
+            delete data.logo
+          } else {
+            data.origin_logo = this.origin_logo
+          }
+        } else {
+          data = Object.assign({}, this.form, {
+            merchant_id: _id,
+            logo
+          })
+        }
         axios({
-          url: origin + '/employ/shop_add',
+          url,
           method: 'post',
           data,
           withCredentials: true
@@ -202,6 +263,14 @@ export default {
       .el-textarea {
         margin-left: 20px;
       }
+    }
+  }
+  .location-form-item .el-form-item__content {
+    display: flex;
+    align-items: center;
+    .get-location {
+      margin-left: 10px;
+      flex-shrink: 0;
     }
   }
 }

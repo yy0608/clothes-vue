@@ -3,7 +3,7 @@
   <title-cont :title="'商家列表 > 添加商家'" :back="true"></title-cont>
   <el-form class="merchant-add-form" :model="form" ref="form" label-width="80px" label-position="left" :rules="rules">
     <el-form-item label="手机号" prop="phone">
-      <el-input type="number" v-model="form.phone" @input="phoneChange"></el-input>
+      <el-input :disabled="!!merchant_id" type="number" v-model="form.phone" @input="phoneChange"></el-input>
     </el-form-item>
     <el-form-item label="负责人" prop="manager">
       <el-input v-model="form.manager"></el-input>
@@ -25,7 +25,7 @@
       <el-input type="textarea" resize="none" v-model="form.desc" placeholder="填写描述或备注或微信qq等其他信息"></el-input>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="submit">添加</el-button>
+      <el-button type="primary" @click="submit">{{merchant_id ? '确定修改' : '确定添加'}}</el-button>
     </el-form-item>
   </el-form>
 </div>
@@ -42,6 +42,7 @@ export default {
       phoneWrote: false,
       smsSent: false,
       countDown: 60,
+      merchant_id: this.$route.query._id,
       form: {
         phone: '',
         manager: '',
@@ -82,51 +83,87 @@ export default {
   components: {
     TitleCont
   },
+  created () {
+    if (this.merchant_id) { // 获取商家信息
+      axios({
+        url: origin + '/employ/merchant_detail',
+        method: 'get',
+        withCredentials: true,
+        params: { _id: this.merchant_id }
+      })
+        .then(res => {
+          if (!res.data.success) {
+            return this.$message.error(res.data.msg)
+          }
+          let serverData = { ...res.data.data }
+          let formKeys = Object.keys(this.form)
+          for (let key in serverData) {
+            if (formKeys.indexOf(key) === -1) {
+              delete serverData[key]
+            }
+          }
+          this.form = { ...serverData }
+          serverData = null
+          this.phoneChange()
+        })
+        .catch(err => {
+          console.log(err)
+          this.$message.error('请求出错')
+        })
+    }
+  },
   methods: {
     submit () {
       this.$refs.form.validate(bool => {
-        if (bool) {
-          axios({
-            url: origin + '/employ/merchant_add',
-            method: 'post',
-            data: this.form,
-            withCredentials: true
-          })
-            .then(res => {
-              if (!res.data.success) {
-                this.$message({
-                  message: res.data.msg,
-                  type: 'error'
-                })
-              } else {
-                this.$alert(`账号：${res.data.data.phone}<br>密码：${res.data.data.password}`, '请妥善保存', {
-                  dangerouslyUseHTMLString: true,
-                  confirmButtonText: '我知道了',
-                  callback: () => {
-                    this.$message({
-                      message: res.data.msg,
-                      type: 'success'
-                    })
-                    setTimeout(() => {
-                      this.$router.go(-1)
-                    }, 1000)
-                  }
-                })
-              }
-            })
-            .catch(err => {
-              console.log(err)
-              this.$message({
-                message: '添加失败',
-                type: 'error'
-              })
-            })
+        if (!bool) {
+          return this.$message.info('表单填写出错')
         }
+        let url = this.merchant_id ? origin + '/employ/merchant_edit' : origin + '/employ/merchant_add'
+        let data = this.merchant_id ? { _id: this.merchant_id, ...this.form } : this.form
+        axios({
+          url,
+          method: 'post',
+          data,
+          withCredentials: true
+        })
+          .then(res => {
+            if (!res.data.success) {
+              return this.$message.error(res.data.msg)
+            }
+            if (this.merchant_id) {
+              this.$message.success(res.data.msg)
+              setTimeout(() => {
+                this.$router.go(-1)
+              }, 1000)
+            } else {
+              this.$alert(`账号：${res.data.data.phone}<br>密码：${res.data.data.password}`, '请妥善保存', {
+                dangerouslyUseHTMLString: true,
+                confirmButtonText: '我知道了',
+                callback: () => {
+                  this.$message({
+                    message: res.data.msg,
+                    type: 'success'
+                  })
+                  setTimeout(() => {
+                    this.$router.go(-1)
+                  }, 1000)
+                }
+              })
+            }
+          })
+          .catch(err => {
+            console.log(err)
+            this.$message({
+              message: '添加失败',
+              type: 'error'
+            })
+          })
       })
     },
     phoneChange () {
-      this.$refs.form.validateField('phone', err => {
-        if (!err && this.form.phone.length === 11) {
+      this.$refs.form.validateField('phone', () => {
+        // if (!err && this.form.phone.length === 11) {
+        if (this.form.phone.length === 11) {
           this.phoneWrote = true
         } else {
           this.phoneWrote = false

@@ -19,7 +19,7 @@ export default {
     },
     delay: {
       type: Number,
-      default: 1000
+      default: 300
     },
     color: {
       type: String,
@@ -49,3 +49,11 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.copy-component {
+  .copy {
+    cursor: pointer;
+  }
+}
+</style>

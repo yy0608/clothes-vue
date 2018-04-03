@@ -7,7 +7,7 @@
         :disabled="!imgsList.length"
         @change="handleCheckAllChange">全选</el-checkbox>
       <div class="total-cont">当前{{imgsList.length}}个文件</div>
-      <el-button size="mini" @click="deleteImg" :disabled="!imgsList.length">删除</el-button>
+      <el-button size="mini" @click="deleteImg" :disabled="!(checkedCount || checkAll) || !imgsList.length">删除</el-button>
       <el-button size="mini" @click="refresh">刷新</el-button>
       <el-button size="mini" @click="move" disabled>移动</el-button>
     </div>
@@ -60,6 +60,7 @@ export default {
       imgsList: [],
       refreshFlag: false,
       parseDate: parseDate,
+      checkedCount: 0,
       checkAll: false,
       checkedList: [],
       marker: '',
@@ -131,8 +132,8 @@ export default {
       this.checkedList = bool ? this.imgsKeyList : []
     },
     handleCheckedChange (value) {
-      let checkedCount = value.length
-      this.checkAll = checkedCount === this.imgsKeyList.length
+      this.checkedCount = value.length
+      this.checkAll = this.checkedCount === this.imgsKeyList.length
     },
     deleteImg () {
       this.$confirm('确认删除？', '提示')

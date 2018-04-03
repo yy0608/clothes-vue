@@ -10,6 +10,14 @@
       :key="index">
       <div class="img-cont">
         <img
+          v-if="item.indexOf(imgOrigin) === -1"
+          :src="item"
+          :width="measure"
+          :height="measure"
+          @error="imgError($event)"
+          @click="showImgView(index)">
+        <img
+          v-else
           :src="item + '?imageView2/2/w/' + parseInt(measure) + '/h/' + parseInt(measure)"
           @error="imgError($event)"
           @click="showImgView(index)">
@@ -67,6 +75,7 @@ export default {
         token: ''
       },
       imgUrl: '',
+      imgOrigin: imgOrigin,
       showView: false,
       curIndex: 0,
       uploadKeyList: []
@@ -111,7 +120,11 @@ export default {
     keySrcList () {
       let resArr = []
       for (let item of this.uploadKeyList) {
-        resArr.push(imgOrigin + item)
+        if (/(http:\/\/)|(https:\/\/)/.test(item)) {
+          resArr.push(item)
+        } else {
+          resArr.push(imgOrigin + item)
+        }
       }
       return resArr
     }
@@ -221,6 +234,8 @@ export default {
     cursor: pointer;
     cursor: zoom-in;
     margin-bottom: 10px;
+    max-width: 100%;
+    max-height: 100%;
     &:hover .el-icon {
       opacity: 1;
       pointer-events: initial;

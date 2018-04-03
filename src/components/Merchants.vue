@@ -2,22 +2,26 @@
 <div class="manage-item merchants-manage-cont">
   <title-cont :title="'商家列表'" :buttons="[{label: '添加商家', func: goAdd}]"></title-cont>
   <el-table :data="merchantList">
-    <el-table-column label="_id">
+    <el-table-column label="_id" width="50px">
       <template slot-scope="props">
-        <copy :content="props.row._id">
-          <div>复制</div>
-        </copy>
+        <copy :content="props.row._id">复制</copy>
       </template>
     </el-table-column>
     <el-table-column prop="phone" label="手机"></el-table-column>
     <el-table-column prop="name" label="名称"></el-table-column>
-    <el-table-column prop="manager" label="联系人"></el-table-column>
     <el-table-column prop="address" label="地址"></el-table-column>
-    <el-table-column label="操作" min-width="130px">
+    <el-table-column prop="manager" label="联系人"></el-table-column>
+    <el-table-column prop="email_verified" label="邮箱验证">
+      <template slot-scope="props">
+        <div v-if="props.row.email_verified">已验证</div>
+        <el-button v-else size="mini">去验证</el-button>
+      </template>
+    </el-table-column>
+    <el-table-column label="操作" min-width="150px">
       <template slot-scope="props">
         <el-button size="mini" @click="goShop(props.row._id)">店铺</el-button>
-        <el-button size="mini" @click="editCategory(props.row._id)">编辑</el-button>
-        <el-button size="mini" @click="deleteCategory(props.$index, props.row._id)">删除</el-button>
+        <el-button size="mini" @click="editMerchant(props.row._id)">编辑</el-button>
+        <el-button size="mini" disabled @click="deleteMerchant(props.$index, props.row._id)">删除</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -71,10 +75,10 @@ export default {
         path: '/home/merchant_shops/' + _id
       })
     },
-    editCategory (_id) {
-      console.log(_id)
+    editMerchant (_id) {
+      this.$router.push('/home/merchant_add?_id=' + _id)
     },
-    deleteCategory (index, _id) {
+    deleteMerchant (index, _id) {
       console.log(index, _id)
     }
   }
