@@ -1,7 +1,79 @@
 <template>
-<div class="merchants-manage-cont">aaa</div>
+<div class="manage-item goods-manage-cont">
+  <title-cont :title="'商家列表 > 店铺列表 > 商品列表'" :buttons="[{label: '添加商品', func: goAdd}]" :back="true"></title-cont>
+  <el-table :data="shopGoods">
+    <el-table-column prop="_id" label="_id"></el-table-column>
+    <el-table-column prop="title" label="标题"></el-table-column>
+    <el-table-column prop="valuation" label="估价">
+      <template slot-scope="props">{{props.row.valuation / 100}}元</template>
+    </el-table-column>
+    <el-table-column prop="merchant_id.name" label="商家"></el-table-column>
+    <el-table-column prop="shop_id.name" label="店铺"></el-table-column>
+    <el-table-column prop="category_id.name" label="分类"></el-table-column>
+    <el-table-column label="分类图标">
+      <template slot-scope="props">
+        <img :src="props.row.category_id.icon + '?imageView2/2/w/50/h/50'">
+      </template>
+    </el-table-column>
+    <el-table-column label="操作" width="220px">
+      <template slot-scope="props">
+        <el-button size="mini" @click="editGoods(props.row._id)">编辑</el-button>
+        <el-button size="mini" @click="toggleHidden(props.row._id)">下架</el-button>
+        <el-button size="mini" disabled @click="deleteGoods(props.$index, props.row._id)">删除</el-button>
+      </template>
+    </el-table-column>
+  </el-table>
+</div>
 </template>
 
 <script>
-export default {}
+import axios from 'axios'
+import { origin } from '@/config.js'
+import TitleCont from './TitleCont.vue'
+
+export default {
+  data () {
+    return {
+      shopGoods: []
+    }
+  },
+  components: {
+    TitleCont
+  },
+  created () {
+    this.getGoodsList()
+  },
+  methods: {
+    goAdd () {
+      let _id = this.$route.params._id
+      this.$router.push({
+        path: '/home/goods_add/' + _id
+      })
+    },
+    getGoodsList () {
+      axios({
+        url: origin + '/employ/goods_list',
+        methods: 'get',
+        withCredentials: true
+      })
+        .then(res => {
+          // console.log(res.data.data[0])
+          this.shopGoods = res.data.data
+        })
+        .catch(err => {
+          console.log(err)
+          this.$message.error('请求出错')
+        })
+    },
+    editGoods (_id) {
+      this.$router.push('/home/goods_add/?_id=' + _id)
+    },
+    toggleHidden (_id) {
+      console.log(_id)
+    },
+    deleteGoods (index, _id) {
+      console.log(index, _id)
+    }
+  }
+}
 </script>

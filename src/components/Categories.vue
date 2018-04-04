@@ -20,7 +20,8 @@
     <el-table-column label="图标" width="100px">
       <template slot-scope="props">
         <copy v-if="props.row.icon" :content="props.row.icon">
-          <img :src="props.row.icon ? props.row.icon + '?imageView2/2/w/50/h/50' : ''">
+          <!-- <img :src="props.row.icon ? props.row.icon + '?imageView2/2/w/50/h/50' : ''"> -->
+          <emage :src="/(http:\/\/)|(https:\/\/)/.test(props.row.icon) ? props.row.icon : imgOrigin + props.row.icon + '?imageView2/2/w/60/h/60'" :width="60" :height="60"></emage>
         </copy>
       </template>
     </el-table-column>
@@ -36,13 +37,14 @@
 
 <script>
 import axios from 'axios'
-import { origin } from '@/config.js'
+import { origin, imgOrigin } from '@/config.js'
 import TitleCont from './TitleCont.vue'
 import Copy from './Copy.vue'
 
 export default {
   data () {
     return {
+      imgOrigin,
       goodsCategories: []
     }
   },
@@ -61,7 +63,12 @@ export default {
       axios({
         url: origin + '/employ/goods_categories',
         withCredentials: true,
-        method: 'get'
+        method: 'get',
+        params: {
+          sort: {
+            updatedAt: -1
+          }
+        }
       })
         .then(res => {
           if (!res.data.success) {

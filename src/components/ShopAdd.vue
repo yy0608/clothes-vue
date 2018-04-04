@@ -108,6 +108,15 @@ export default {
   ]),
   created () {
     if (this.shop_id) {
+      this.getShopDetail()
+    }
+  },
+  components: {
+    TitleCont,
+    Upload
+  },
+  methods: {
+    getShopDetail () {
       axios({
         url: origin + '/employ/shop_detail',
         method: 'get',
@@ -118,7 +127,6 @@ export default {
           if (!res.data.success) {
             return this.$message.error(res.data.msg)
           }
-          // console.log(res.data.data)
           this.origin_logo = res.data.data.logo
           let logo = /(http:\/\/)|(https:\/\/)/.test(res.data.data.logo) ? res.data.data.logo : imgOrigin + res.data.data.logo
           this.form = {
@@ -126,22 +134,15 @@ export default {
             location: res.data.data.location.join(','),
             logo
           }
+          // 设置子组件upload的图片
           let key = logo.replace(imgOrigin, '')
           this.$refs.upload.uploadKeyList = [ key ]
-          // this.defaultKeyList = [ logo ]
-          console.log(this.form)
         })
         .catch(err => {
           console.log(err)
           this.$message.error('请求出错')
         })
-    }
-  },
-  components: {
-    TitleCont,
-    Upload
-  },
-  methods: {
+    },
     submit () {
       this.$refs.form.validate(bool => {
         if (!bool) {
@@ -180,18 +181,12 @@ export default {
         })
           .then(res => {
             if (res.data.success) {
-              this.$message({
-                message: res.data.msg,
-                type: 'success'
-              })
+              this.$message.success(res.data.msg)
               setTimeout(() => {
                 this.$router.go(-1)
               }, 1000)
             } else {
-              this.$message({
-                message: res.data.msg,
-                type: 'error'
-              })
+              this.$message.error(res.data.msg)
             }
           })
           .catch(err => {

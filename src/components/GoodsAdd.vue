@@ -76,7 +76,6 @@ export default {
     Upload
   },
   created () {
-    console.log(this.shop_id)
     this.getGoodsCategories()
   },
   methods: {
