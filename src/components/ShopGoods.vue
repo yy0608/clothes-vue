@@ -2,7 +2,13 @@
 <div class="manage-item goods-manage-cont">
   <title-cont :title="'商家列表 > 店铺列表 > 商品列表'" :buttons="[{label: '添加商品', func: goAdd}]" :back="true"></title-cont>
   <el-table :data="shopGoods">
-    <el-table-column prop="_id" label="_id"></el-table-column>
+    <el-table-column label="_id">
+      <template slot-scope="props">
+        <copy :content="props.row._id">
+          <div>复制</div>
+        </copy>
+      </template>
+    </el-table-column>
     <el-table-column prop="title" label="标题"></el-table-column>
     <el-table-column prop="valuation" label="估价">
       <template slot-scope="props">{{props.row.valuation / 100}}元</template>
@@ -12,7 +18,9 @@
     <el-table-column prop="category_id.name" label="分类"></el-table-column>
     <el-table-column label="分类图标">
       <template slot-scope="props">
-        <img :src="props.row.category_id.icon + '?imageView2/2/w/50/h/50'">
+        <copy :content="props.row.category_id.icon">
+          <emage :src="/(http:\/\/)|(https:\/\/)/.test(props.row.category_id.icon) ? props.row.category_id.icon : imgOrigin + props.row.category_id.icon + '?imageView2/2/w/60/h/60'" :width="60" :height="60"></emage>
+        </copy>
       </template>
     </el-table-column>
   </el-table>
@@ -21,18 +29,21 @@
 
 <script>
 import axios from 'axios'
-import { origin } from '@/config.js'
+import { origin, imgOrigin } from '@/config.js'
+import Copy from './Copy.vue'
 import TitleCont from './TitleCont.vue'
 
 export default {
   data () {
     return {
       shop_id: this.$route.params._id,
+      imgOrigin,
       shopGoods: []
     }
   },
   components: {
-    TitleCont
+    TitleCont,
+    Copy
   },
   created () {
     this.getGoodsList()

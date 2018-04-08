@@ -10,11 +10,10 @@
       </template>
     </el-table-column>
     <el-table-column prop="name" label="名称"></el-table-column>
-    <el-table-column prop="logo" label="logo">
+    <el-table-column label="logo">
       <template slot-scope="props">
         <copy :content="props.row.logo">
           <emage :src="/(http:\/\/)|(https:\/\/)/.test(props.row.logo) ? props.row.logo : imgOrigin + props.row.logo + '?imageView2/2/w/60/h/60'" :width="60" :height="60"></emage>
-          <!-- <img :src="/(http:\/\/)|(https:\/\/)/.test(props.row.logo) ? props.row.logo : imgOrigin + props.row.logo + '?imageView2/2/w/60/h/60'" width="60" height="60" :alt="props.row.desc"> -->
         </copy>
       </template>
     </el-table-column>

@@ -76,7 +76,7 @@ export default {
         })
     },
     checkPathHasString (path) {
-      if (/merchant/i.test(path) || /shop_add/i.test(path) || /shop_goods/i.test(path) || /goods_add/i.test(path)) {
+      if (/(merchants)|(merchant_add)|(merchant_shops)|(shop_add)/ig.test(path)) {
         this.routerData[0].active = true
       } else {
         this.routerData[0].active = false
@@ -85,6 +85,11 @@ export default {
         this.routerData[1].active = true
       } else {
         this.routerData[1].active = false
+      }
+      if (/(shop_goods)|(goods_add)/i.test(path)) {
+        this.routerData[2].active = true
+      } else {
+        this.routerData[2].active = false
       }
     },
     goIndex (e) {

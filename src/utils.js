@@ -100,12 +100,18 @@ export const formatCategoriesForCascader = (data, lastDisabled) => { // 请求�
   return resArr
 }
 
-export const formatCategoryForDefaultValue = (data, categories) => { // 通过当前分类获取所在分类的数组
+export const formatCategoryForDefaultValue = (data, categories, showAll) => { // 通过当前分类获取所在分类的数组
   let resData = []
   switch (data.level) {
     case 1:
+      if (showAll) {
+        resData[0] = data._id
+      }
       break
     case 2:
+      if (showAll) {
+        resData[1] = data._id
+      }
       for (let item of categories) {
         if (item._id === data.parent_id) {
           resData[0] = item._id
@@ -113,6 +119,9 @@ export const formatCategoryForDefaultValue = (data, categories) => { // 通过�
       }
       break
     case 3:
+      if (showAll) {
+        resData[2] = data._id
+      }
       for (let item of categories) {
         if (item._id === data.parent_id) {
           resData[1] = item._id

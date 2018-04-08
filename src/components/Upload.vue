@@ -189,6 +189,7 @@ export default {
     },
     deleteImg (index) {
       this.uploadKeyList.splice(index, 1)
+      this.onSuccess && this.onSuccess(this.uploadKeyList)
     },
     imgError (e) {
       this.$message.error('图片加载失败')
@@ -207,6 +208,7 @@ export default {
           break
       }
       this.uploadKeyList.splice(srcIdx, 1, ...this.uploadKeyList.splice(destIdx, 1, this.uploadKeyList[srcIdx]))
+      this.onSuccess && this.onSuccess(this.uploadKeyList)
     },
     beyondLimit () {
       this.$message.error('文件超出' + this.limit + '个')

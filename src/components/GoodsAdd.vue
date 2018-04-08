@@ -1,11 +1,15 @@
 <template>
 <div class="manage-item goods-add-manage-cont">
-  <title-cont :title="'商家列表 > 店铺列表 > 商品列表 > 添加商品'" :back="true"></title-cont>
+  <title-cont :title="shop_id ? '商家列表 > 店铺列表 > 商品列表 > 添加商品' : '商品列表 > 添加商品'" :back="true"></title-cont>
   <el-form class="goods-add-form" :model="form" ref="form" label-width="80px" label-position="left" :rules="rules">
+    <el-form-item label="店铺id" prop="shop_id">
+      <el-input :disabled="!!shop_id || !!goods_id" v-model="form.shop_id"></el-input>
+    </el-form-item>
     <el-form-item label="类别" prop="category">
       <el-cascader
         clearable
         v-model="form.category"
+        :disabled="!!goods_id"
         :options="goodsCategories"
       ></el-cascader>
     </el-form-item>
@@ -33,14 +37,17 @@ import axios from 'axios'
 import { origin } from '@/config.js'
 import TitleCont from './TitleCont.vue'
 import Upload from './Upload.vue'
-import { formatCategoriesForCascader } from '@/utils.js'
+import { formatCategoriesForCascader, formatCategoryForDefaultValue } from '@/utils.js'
 
 export default {
   data () {
     return {
+      categoryList: [],
       goodsCategories: [],
-      shop_id: this.$route.params && this.$route.params._id,
+      shop_id: this.$route.params._id ? this.$route.params._id : '',
+      goods_id: this.$route.query._id ? this.$route.query._id : '',
       form: {
+        shop_id: this.$route.params._id ? this.$route.params._id : '',
         title: '',
         category: [],
         valuation: '',
@@ -48,6 +55,11 @@ export default {
         detail_imgs: []
       },
       rules: {
+        shop_id: [{
+          required: true,
+          message: '请输入正确的店铺id',
+          validator: null
+        }],
         title: [{
           required: true,
           message: '输入商品标题'
@@ -77,6 +89,10 @@ export default {
   },
   created () {
     this.getGoodsCategories()
+    if (this.goods_id) {
+      this.getGoodsDetail()
+    }
+    this.changeRules()
   },
   methods: {
     getGoodsCategories () {
@@ -89,11 +105,80 @@ export default {
           if (!res.data.success) {
             return this.$message.error('获取分类列表失败')
           }
+          this.categoryList = res.data.data
           this.goodsCategories = formatCategoriesForCascader(res.data.data, undefined)
         })
         .catch(err => {
           console.log(err)
         })
+    },
+    getGoodsDetail () {
+      axios({
+        url: origin + '/employ/goods_detail',
+        method: 'get',
+        params: { _id: this.goods_id },
+        withCredentials: true
+      })
+        .then(res => {
+          if (!res.data.success) {
+            return this.$message.error(res.data.msg)
+          }
+          let tempData = { ...res.data.data }
+          delete tempData.createdAt
+          delete tempData.created_ts
+          delete tempData.updatedAt
+          delete tempData._id
+          delete tempData.merchant_id
+          // this.timer = setInterval(() => {},)
+          this.form = {
+            ...tempData,
+            valuation: tempData.valuation / 100,
+            category: formatCategoryForDefaultValue(tempData.category_id, this.categoryList, true) // 此处待优化，不知道哪个请求快，this.categoryList可能为空
+          }
+          delete this.form.category_id
+          this.origin_figure_imgs = [ ...tempData.figure_imgs ]
+          this.origin_detail_imgs = [ ...tempData.detail_imgs ]
+          this.$refs.figureUpload.uploadKeyList = [ ...tempData.figure_imgs ]
+          this.$refs.detailUpload.uploadKeyList = [ ...tempData.detail_imgs ]
+          this.categoryList = null
+          tempData = null
+        })
+        .catch(err => {
+          console.log(err)
+          this.$message.error('请求出错')
+        })
+    },
+    changeRules () {
+      if (this.shop_id) {
+        this.$set(this.rules, 'shop_id', null)
+      } else {
+        this.$set(this.rules, 'shop_id', [{
+          required: true,
+          trigger: 'blur', // change
+          validator: (rule, value, callback) => {
+            if (!value.match(/^[0-9a-fA-F]{24}$/)) {
+              return callback(new Error('请输入正确店铺id'))
+            }
+            axios({
+              url: origin + '/employ/shop_detail',
+              method: 'get',
+              params: { shop_id: value }
+            })
+              .then(res => {
+                // console.log(res.data)
+                if (res.data.success) {
+                  callback()
+                } else {
+                  callback(new Error(res.data.msg))
+                }
+              })
+              .catch(err => {
+                console.log(err)
+                callback(new Error('请求出错'))
+              })
+          }
+        }])
+      }
     },
     uploadFigureSuccess (val) {
       this.form.figure_imgs = val
@@ -107,15 +192,21 @@ export default {
           return this.$message.error('填写出错')
         }
         let data = {
-          shop_id: this.shop_id,
-          title: this.form.title,
+          ...this.form,
           category_id: this.form.category[this.form.category.length - 1],
-          valuation: this.form.valuation * 100,
-          figure_imgs: this.form.figure_imgs,
-          detail_imgs: this.form.detail_imgs
+          valuation: this.form.valuation * 100
         }
+        delete data.category
+        if (this.goods_id) {
+          data.goods_id = this.goods_id
+          data.origin_figure_imgs = [ ...this.origin_figure_imgs ]
+          data.origin_detail_imgs = [ ...this.origin_detail_imgs ]
+          delete data.category_id
+          delete data.shop_id
+        }
+        let url = this.goods_id ? origin + '/employ/goods_edit' : origin + '/employ/goods_add'
         axios({
-          url: origin + '/employ/goods_add',
+          url,
           method: 'post',
           withCredentials: true,
           data: data
@@ -124,9 +215,9 @@ export default {
             console.log(res.data)
             if (res.data.success) {
               this.$message.success(res.data.msg)
-              this.$refs.form.resetFields()
-              this.$refs.figureUpload.uploadKeyList = []
-              this.$refs.detailUpload.uploadKeyList = []
+              // setTimeout(() => {
+              //   this.$router.go(-1)
+              // }, 1000)
             } else {
               this.$message.error(res.data.msg)
             }
