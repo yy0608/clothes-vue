@@ -1,12 +1,10 @@
 <template>
 <div class="manage-item goods-manage-cont">
-  <title-cont :title="shop_id ? '商家列表 > 店铺列表 > 商品列表' : '商品列表'" :buttons="[{label: '添加商品', func: goAdd}]" :back="true"></title-cont>
+  <title-cont :title="shop_id ? '商家列表 > 店铺列表 > 商品列表' : '商品列表'" :buttons="[{label: '添加商品', func: goAdd}]" :back="!!shop_id"></title-cont>
   <el-table :data="shopGoods">
     <el-table-column label="_id">
       <template slot-scope="props">
-        <copy :content="props.row._id">
-          <div>复制</div>
-        </copy>
+        <copy :content="props.row._id">复制</copy>
       </template>
     </el-table-column>
     <el-table-column prop="title" label="标题"></el-table-column>

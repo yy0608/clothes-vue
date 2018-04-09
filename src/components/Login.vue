@@ -4,10 +4,10 @@
     <div class="tc bf title">内部后台系统</div>
     <el-form class="login-form" :model="form" ref="form" label-width="80px" label-position="top" :rules="rules">
       <el-form-item label="用户名" prop="username">
-        <el-input v-model="form.username"></el-input>
+        <el-input v-model="form.username" @keyup.enter.native="enterSubmit"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password">
-        <el-input v-model="form.password" type="password"></el-input>
+        <el-input v-model="form.password" type="password" @keyup.enter.native="enterSubmit"></el-input>
       </el-form-item>
       <el-form-item label="验证码">
         <div id="code"></div>
@@ -61,6 +61,9 @@ export default {
         success: token => {
           this.verified = true
           this.dxToken = token
+          if (this.form.username && this.form.password) {
+            this.submit()
+          }
         },
         fail: res => {
           this.verified = false
@@ -76,6 +79,11 @@ export default {
       window.onresize = () => {
         this.$set(this.loginContStyle, 'width', document.documentElement.clientWidth + 'px')
         this.$set(this.loginContStyle, 'height', document.documentElement.clientHeight + 'px')
+      }
+    },
+    enterSubmit () {
+      if (this.form.username && this.form.password) {
+        this.submit()
       }
     },
     submit () {

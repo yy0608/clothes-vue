@@ -13,6 +13,8 @@ import GoodsAdd from '@/components/GoodsAdd'
 import Categories from '@/components/Categories'
 import CategoryAdd from '@/components/CategoryAdd'
 import Goods from '@/components/Goods'
+import Topics from '@/components/Topics'
+import TopicAdd from '@/components/TopicAdd'
 import Users from '@/components/Users'
 import Images from '@/components/Images'
 
@@ -89,6 +91,16 @@ const router = new Router({
               name: 'Goods',
               path: 'goods',
               component: Goods
+            },
+            {
+              name: 'Topics',
+              path: 'topics',
+              component: Topics
+            },
+            {
+              name: 'TopicAdd',
+              path: 'topic_add/:_id?',
+              component: TopicAdd
             },
             {
               name: 'Users',

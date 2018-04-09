@@ -1,6 +1,6 @@
 <template>
 <div class="manage-item goods-manage-cont">
-  <title-cont :title="'分类列表'" :buttons="[{label: '添加分类', func: goAdd}]" :back="true"></title-cont>
+  <title-cont :title="'分类列表'" :buttons="[{label: '添加分类', func: goAdd}]" :back="false"></title-cont>
   <el-table :data="goodsCategories">
     <el-table-column label="_id" width="50px">
       <template slot-scope="props">

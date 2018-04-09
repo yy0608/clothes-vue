@@ -51,7 +51,7 @@ export default {
       defaultCategory: [],
       defaultKeyList: [],
       validLevel: 2,
-      category_id: this.$route.query._id,
+      category_id: this.$route.query._id ? this.$route.query._id : '',
       isEdit: !!this.$route.query._id,
       form: {
         name: '',
@@ -178,7 +178,6 @@ export default {
           } else {
             data.origin_icon = this.origin_icon
           }
-          console.log(data)
         } else { // 添加状态
           data = {
             ...this.form,
@@ -224,8 +223,6 @@ export default {
 
 <style lang="scss">
 .merchant-add-form {
-  padding: 20px;
-  width: 500px;
   .el-cascader {
     width: 100%;
   }

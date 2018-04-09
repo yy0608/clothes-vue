@@ -1,62 +1,57 @@
 <template>
-<div class="merchants-manage-cont">
-  <el-form :model="form" ref="form" :rules="rules">
-    <el-form-item label="id" prop="id">
-      <el-input v-model="form.id"></el-input>
-    </el-form-item>
-    <el-form-item>
-      <el-button type="primary" @click="submit">添加</el-button>
-    </el-form-item>
-  </el-form>
+<div class="manage-item users-manage-cont">
+  <title-cont :title="'用户列表'" :buttons="[{label: '添加用户', func: goAdd}]" :back="false"></title-cont>
+  <el-table :data="userList">
+    <el-table-column prop="_id" label="_id">
+      <template slot-scope="props">
+        <copy :content="props.row._id">复制</copy>
+      </template>
+    </el-table-column>
+    <el-table-column prop="name" label="name"></el-table-column>
+    <el-table-column prop="username" label="username"></el-table-column>
+  </el-table>
 </div>
 </template>
 
 <script>
 import axios from 'axios'
 import { origin } from '@/config.js'
+import Copy from './Copy.vue'
+import TitleCont from './TitleCont.vue'
 
 export default {
   data () {
     return {
-      form: {
-        id: ''
-      },
-      rules: {
-        id: [{
-          required: true,
-          trigger: 'blur',
-          validator: (rule, value, callback) => {
-            if (!value) {
-              return callback(new Error('请再次输入密码'))
-            }
-            axios({
-              url: origin + '/employ/shop_detail',
-              method: 'get',
-              params: { shop_id: value }
-            })
-              .then(res => {
-                console.log(res.data)
-                if (res.data.success) {
-                  callback()
-                } else {
-                  callback(new Error(res.data.msg))
-                }
-              })
-              .catch(err => {
-                console.log(err)
-                callback(new Error('请求出错'))
-              })
-          }
-        }]
-      }
+      userList: []
     }
   },
+  created () {
+    this.getEmployUsers()
+  },
+  components: {
+    Copy,
+    TitleCont
+  },
   methods: {
-    submit () {
-      this.$refs.form.validate(bool => {
-        console.log(bool)
-        console.log(this.form)
+    getEmployUsers () {
+      axios({
+        url: origin + '/employ/user_list',
+        method: 'get',
+        withCredentials: true
       })
+        .then(res => {
+          if (!res.data.success) {
+            return this.$message.error(res.data.msg)
+          }
+          this.userList = res.data.data
+        })
+        .catch(err => {
+          console.log(err)
+          this.$message.error('请求出错')
+        })
+    },
+    goAdd () {
+      // this.$router.go()
     }
   }
 }

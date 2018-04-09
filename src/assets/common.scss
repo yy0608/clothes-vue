@@ -45,3 +45,10 @@ div:focus {
   height: 200px;
   line-height: 200px;
 }
+.el-form-item:last-child .el-button {
+  width: 100%;
+}
+.manage-item .el-form {
+  width: 500px;
+  padding: 20px;
+}

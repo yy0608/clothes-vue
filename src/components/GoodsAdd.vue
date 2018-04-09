@@ -26,7 +26,7 @@
       <upload :multiple="true" ref="detailUpload" :dirname="'goods/detail'" :onSuccess="uploadDetailSuccess"></upload>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="submit">添加</el-button>
+      <el-button type="primary" @click="submit">{{goods_id ? '确认修改' : '确认添加'}}</el-button>
     </el-form-item>
   </el-form>
 </div>
@@ -215,9 +215,9 @@ export default {
             console.log(res.data)
             if (res.data.success) {
               this.$message.success(res.data.msg)
-              // setTimeout(() => {
-              //   this.$router.go(-1)
-              // }, 1000)
+              setTimeout(() => {
+                this.$router.go(-1)
+              }, 1000)
             } else {
               this.$message.error(res.data.msg)
             }

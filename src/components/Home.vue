@@ -33,8 +33,12 @@ export default {
           label: '商品管理'
         },
         {
+          path: '/home/topics',
+          label: '帖子管理'
+        },
+        {
           path: '/home/users',
-          label: '用户管理'
+          label: '内部用户'
         },
         {
           path: '/home/images',
@@ -90,6 +94,11 @@ export default {
         this.routerData[2].active = true
       } else {
         this.routerData[2].active = false
+      }
+      if (/topic_add/i.test(path)) {
+        this.routerData[3].active = true
+      } else {
+        this.routerData[3].active = false
       }
     },
     goIndex (e) {
