@@ -90,7 +90,7 @@ export default {
       type: Array,
       default: () => {
         return []
-        // return ['a.jpg', 'cache/category_icon/6e933fc6-ca09-4992-8658-de248dce36cc.png', 'cache/category_icon/50ae16c1-0fc7-4983-b58c-0c4de8322175.png', 'logo.png', 'w.jpg']
+        // return ['common/a.jpg', 'common/logo.png', 'common/w.jpg']
       }
     },
     multiple: {
@@ -110,6 +110,9 @@ export default {
     },
     onError: {
       type: Function
+    },
+    meta: {
+      default: null
     }
   },
   created () {
@@ -174,11 +177,11 @@ export default {
       } else {
         this.uploadKeyList = [res.key]
       }
-      this.onSuccess && this.onSuccess(this.uploadKeyList)
+      this.onSuccess && this.onSuccess(this.uploadKeyList, this.meta)
     },
     handleError (err, file) {
       this.$message.error('上传文件失败')
-      this.onError && this.onError(err, file)
+      this.onError && this.onError(err, file, this.meta)
     },
     showImgView (index) {
       this.showView = true
@@ -189,7 +192,7 @@ export default {
     },
     deleteImg (index) {
       this.uploadKeyList.splice(index, 1)
-      this.onSuccess && this.onSuccess(this.uploadKeyList)
+      this.onSuccess && this.onSuccess(this.uploadKeyList, this.meta)
     },
     imgError (e) {
       this.$message.error('图片加载失败')
@@ -208,7 +211,7 @@ export default {
           break
       }
       this.uploadKeyList.splice(srcIdx, 1, ...this.uploadKeyList.splice(destIdx, 1, this.uploadKeyList[srcIdx]))
-      this.onSuccess && this.onSuccess(this.uploadKeyList)
+      this.onSuccess && this.onSuccess(this.uploadKeyList, this.meta)
     },
     beyondLimit () {
       this.$message.error('文件超出' + this.limit + '个')
