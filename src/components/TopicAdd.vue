@@ -91,7 +91,10 @@ export default {
         data
       })
         .then(res => {
-          console.log(res.data)
+          if (!res.data.success) {
+            return this.$message.error(res.data.msg)
+          }
+          this.$router.go(-1)
         })
         .catch(err => {
           console.log(err)
@@ -116,7 +119,6 @@ export default {
     uploadSuccess (keyList, index) {
       // console.log(keyList, index)
       this.form.content[index].value = keyList
-      console.log(this.form)
     },
     uploadError (err, file, index) {
       console.log(err, file, index)

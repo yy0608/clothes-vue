@@ -1,35 +1,55 @@
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
 }
+
 body {
   font-size: 14px;
   color: #333;
   opacity: .4;
 }
+
 p {
   margin: 0;
 }
+
 a {
   text-decoration: none;
   color: #333;
 }
+
+::-webkit-scrollbar {
+  width: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #888;
+}
+
 div:focus {
   outline: 0;
 }
+
 .bf {
   background-color: #fff;
 }
+
 .tc {
   text-align: center;
 }
+
 .manage-item {
   padding: 10px;
 }
+
 .dx_captcha {
   height: 40px;
 }
+
+
 /* 图片预览组件的css */
+
 #imageView .imageBox li {
   display: flex;
   justify-content: center;
@@ -40,14 +60,17 @@ div:focus {
     height: auto !important;
   }
 }
+
 .no-data {
   text-align: center;
   height: 200px;
   line-height: 200px;
 }
+
 .el-form-item:last-child .el-button {
   width: 100%;
 }
+
 .manage-item .el-form {
   width: 500px;
   padding: 20px;
