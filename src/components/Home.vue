@@ -37,8 +37,12 @@ export default {
           label: '帖子管理'
         },
         {
-          path: '/home/users',
+          path: '/home/employ_users',
           label: '内部用户'
+        },
+        {
+          path: '/home/users',
+          label: '用户管理'
         },
         {
           path: '/home/images',
@@ -99,6 +103,11 @@ export default {
         this.routerData[3].active = true
       } else {
         this.routerData[3].active = false
+      }
+      if (/user_add/i.test(path)) {
+        this.routerData[5].active = true
+      } else {
+        this.routerData[5].active = false
       }
     },
     goIndex (e) {

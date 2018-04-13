@@ -7,6 +7,7 @@
         <copy :content="props.row._id">复制</copy>
       </template>
     </el-table-column>
+    <el-table-column prop="name" label="name"></el-table-column>
     <el-table-column prop="username" label="username"></el-table-column>
   </el-table>
 </div>
@@ -34,7 +35,7 @@ export default {
   methods: {
     getEmployUsers () {
       axios({
-        url: origin + '/user/user_list',
+        url: origin + '/employ/user_list',
         method: 'get',
         withCredentials: true
       })
@@ -50,7 +51,7 @@ export default {
         })
     },
     goAdd () {
-      this.$router.push('/home/user_add')
+      // this.$router.go()
     }
   }
 }

@@ -15,7 +15,9 @@ import CategoryAdd from '@/components/CategoryAdd'
 import Goods from '@/components/Goods'
 import Topics from '@/components/Topics'
 import TopicAdd from '@/components/TopicAdd'
+import EmployUsers from '@/components/EmployUsers'
 import Users from '@/components/Users'
+import UserAdd from '@/components/UserAdd'
 import Images from '@/components/Images'
 
 let ifCheckedLogin = false
@@ -103,9 +105,19 @@ const router = new Router({
               component: TopicAdd
             },
             {
+              name: 'EmployUsers',
+              path: 'employ_users',
+              component: EmployUsers
+            },
+            {
               name: 'Users',
               path: 'users',
               component: Users
+            },
+            {
+              name: 'UserAdd',
+              path: 'user_add',
+              component: UserAdd
             },
             {
               name: 'Images',
