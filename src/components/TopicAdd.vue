@@ -2,8 +2,17 @@
 <div class="manage-item topic-add-manage-cont">
   <title-cont :title="'帖子列表 > 添加帖子'" :back="true"></title-cont>
   <el-form class="topic-add-form" :model="form" ref="form" label-width="80px" label-position="left" :rules="rules" :validate-on-rule-change="false">
+    <el-form-item label="选择用户">
+      <el-select v-model="form.author_id">
+        <el-option
+          v-for="item in userList"
+          :value="item._id"
+          :key="item.username"
+          :label="item.username"></el-option>
+      </el-select>
+    </el-form-item>
     <el-form-item label="标题">
-      <el-input v-model="form.title"></el-input>
+      <el-input type="textarea" resize="none" v-model="form.title"></el-input>
     </el-form-item>
     <el-form-item
       v-for="(item, index) in form.content"
@@ -13,6 +22,7 @@
           v-if="item.type === 1"
           v-model="item.value"
           type="textarea"
+          :autosize="{ minRows: 2, maxRows: 6 }"
           resize="none"></el-input>
         <upload
           v-if="item.type === 2"
@@ -46,6 +56,7 @@ export default {
   data () {
     return {
       form: {
+        author_id: '',
         title: '',
         content: [{
           value: '',
@@ -58,8 +69,12 @@ export default {
           required: true,
           message: '输入分类名称'
         }]
-      }
+      },
+      userList: []
     }
+  },
+  created () {
+    this.getUserList()
   },
   components: {
     TitleCont,
@@ -67,9 +82,23 @@ export default {
   },
   computed: mapState([ 'userInfo' ]),
   methods: {
+    getUserList () {
+      axios({
+        url: origin + '/user/user_list',
+        method: 'get',
+        withCredentials: true,
+        params: { find_admin: true }
+      })
+        .then(res => {
+          if (!res.data.success) {
+            return this.$message.error(res.data.msg)
+          }
+          this.userList = res.data.data
+        })
+    },
     submit () {
-      if (!this.form.title || !this.form.content.length) {
-        return this.$message.error('请填写标题和内容')
+      if (!this.form.author_id || !this.form.title || !this.form.content.length) {
+        return this.$message.error('请选择用户并填写标题和内容')
       }
       for (let item of this.form.content) {
         if (!item.value) {
@@ -77,7 +106,8 @@ export default {
         }
       }
       let data = {
-        author_id: this.userInfo && this.userInfo._id,
+        // author_id: this.userInfo && this.userInfo._id,
+        author_id: this.form.author_id,
         title: this.form.title,
         content: this.form.content.map(item => {
           delete item.key
@@ -94,7 +124,10 @@ export default {
           if (!res.data.success) {
             return this.$message.error(res.data.msg)
           }
-          this.$router.go(-1)
+          this.$message.error(res.data.msg)
+          setTimeout(() => {
+            this.$router.go(-1)
+          }, 1000)
         })
         .catch(err => {
           console.log(err)
@@ -141,6 +174,9 @@ export default {
       &:hover .el-icon-close {
         opacity: 1;
       }
+    }
+    .el-select {
+      width: 100%;
     }
     .el-icon-close {
       position: absolute;

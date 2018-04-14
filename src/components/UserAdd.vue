@@ -6,7 +6,7 @@
       <el-input v-model="form.username"></el-input>
     </el-form-item>
     <el-form-item label="密码" prop="password">
-      <el-input v-model="form.password"></el-input>
+      <el-input type="password" v-model="form.password"></el-input>
     </el-form-item>
     <el-form-item label="昵称" prop="nickname">
       <el-input v-model="form.nickname"></el-input>
@@ -64,6 +64,13 @@ export default {
         })
           .then(res => {
             console.log(res.data)
+            if (!res.data.success) {
+              return this.$message.error(res.data.msg)
+            }
+            this.$message.success(res.data.msg)
+            setTimeout(() => {
+              this.$router.go(-1)
+            }, 1000)
           })
           .catch(err => {
             console.log(err)

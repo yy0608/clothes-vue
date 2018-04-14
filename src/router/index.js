@@ -15,6 +15,7 @@ import CategoryAdd from '@/components/CategoryAdd'
 import Goods from '@/components/Goods'
 import Topics from '@/components/Topics'
 import TopicAdd from '@/components/TopicAdd'
+import TopicCheck from '@/components/TopicCheck'
 import EmployUsers from '@/components/EmployUsers'
 import Users from '@/components/Users'
 import UserAdd from '@/components/UserAdd'
@@ -103,6 +104,11 @@ const router = new Router({
               name: 'TopicAdd',
               path: 'topic_add/:_id?',
               component: TopicAdd
+            },
+            {
+              name: 'TopicCheck',
+              path: 'topic_check',
+              component: TopicCheck
             },
             {
               name: 'EmployUsers',

@@ -33,6 +33,10 @@ export default {
           label: '商品管理'
         },
         {
+          path: '/home/topic_check',
+          label: '帖子审核'
+        },
+        {
           path: '/home/topics',
           label: '帖子管理'
         },
