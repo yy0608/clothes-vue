@@ -1,10 +1,12 @@
 <template>
 <div class="image-view-cont">
-  <image-view
-    :imgArr="imgArr"
-    :showImageView="true"
-    :imageIndex="curIndex"
-    @hideImage="hideImageView"></image-view>
+  <template v-if="show">
+    <image-view
+      :imgArr="imgArr"
+      :showImageView="true"
+      :imageIndex="curIndex"
+      @hideImage="hideImageView"></image-view>
+  </template>
 </div>
 </template>
 
@@ -35,7 +37,7 @@ export default {
       this.show = true
     },
     hideImageView () {
-      this.$emit('hideImageView')
+      this.show = false
     }
   }
 }

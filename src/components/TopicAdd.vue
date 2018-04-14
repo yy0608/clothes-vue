@@ -124,7 +124,7 @@ export default {
           if (!res.data.success) {
             return this.$message.error(res.data.msg)
           }
-          this.$message.error(res.data.msg)
+          this.$message.success(res.data.msg)
           setTimeout(() => {
             this.$router.go(-1)
           }, 1000)

@@ -46,13 +46,14 @@ import axios from 'axios'
 import { origin, imgOrigin } from '@/config.js'
 import TitleCont from './TitleCont.vue'
 import Copy from './Copy.vue'
-import { parseDate } from '@/utils.js'
+import { parseDate, changeEnter } from '@/utils.js'
 
 export default {
   data () {
     return {
       topicList: [],
       parseDate,
+      changeEnter,
       imgOrigin
     }
   },
@@ -81,12 +82,6 @@ export default {
     },
     goAdd () {
       this.$router.push('/home/topic_add')
-    },
-    changeEnter (str) {
-      var resStr = str.replace(/<\s*/g, '&lt;')
-      resStr = resStr.replace(/&lt;\s*/g, '&lt; ')
-      resStr = resStr.replace(/\n/g, '<br>')
-      return resStr
     }
   }
 }
