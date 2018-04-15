@@ -9,6 +9,7 @@
     </el-table-column>
     <el-table-column prop="title" label="标题"></el-table-column>
     <el-table-column prop="author_id.username" label="作者" width="80px"></el-table-column>
+    <el-table-column prop="status" label="状态" width="50px"></el-table-column>
     <el-table-column label="内容" class="topic-popover-column">
       <template slot-scope="props">
         <el-popover ref="popover" :title="props.row.title">

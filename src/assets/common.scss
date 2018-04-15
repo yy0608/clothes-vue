@@ -47,6 +47,9 @@ div:focus {
   height: 40px;
 }
 
+.el-message {
+  pointer-events: none;
+}
 
 /* 图片预览组件的css */
 

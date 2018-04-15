@@ -1,7 +1,7 @@
 <template>
 <div class="manage-item topic-check-manage-cont">
   <title-cont :title="'帖子审核 ( ' + totalCheckTopicCount + ' )'" :back="false"></title-cont>
-  <div class="check-cont">
+  <div class="check-cont" v-if="checkTopicData._id">
     <div class="title">{{checkTopicData.title}}</div>
     <div class="content">
       <div :class="[item.type === 2 ? 'img-content-item' : '', 'content-item']" v-for="(item, index) in checkTopicData.content" :key="index">
@@ -14,8 +14,9 @@
       </div>
     </div>
   </div>
+  <div v-else class="no-data" @click="refreshData">暂无数据，点击获取</div>
   <image-view ref="imageView" :imgArr="topicContentImgsArr" :curIndex="curIndex" />
-  <div class="handle-cont">
+  <div class="handle-cont" v-if="checkTopicData._id">
     <el-button
       plain
       class="handle-item"
@@ -103,9 +104,11 @@ export default {
           if (!res.data.success) {
             return this.$message.error(res.data.msg)
           }
-          this.checkTopicData = res.data.data
-          this.totalCheckTopicCount = res.data.count
-          console.log(res.data)
+          if (res.data.data) {
+            this.checkTopicData = res.data.data
+            this.totalCheckTopicCount = res.data.count
+          }
+          // console.log(res.data)
         })
         .catch(err => {
           console.log(err)
@@ -122,7 +125,34 @@ export default {
       this.$refs.imageView.showImgView()
     },
     handleCheck (value) {
-      console.log(value)
+      axios({
+        url: origin + '/employ/topic_check',
+        method: 'post',
+        withCredentials: true,
+        data: {
+          _id: this.checkTopicData._id,
+          status: value
+        }
+      })
+        .then(res => {
+          if (!res.data.success) {
+            return this.$message.error(res.data.msg)
+          }
+          console.log(res.data)
+          this.$message.success(res.data.msg)
+          if (res.data.data) {
+            this.checkTopicData = res.data.data
+            this.totalCheckTopicCount = res.data.count
+          }
+        })
+        .catch(err => {
+          console.log(err)
+          this.$message.error('请求出错')
+        })
+    },
+    refreshData () {
+      this.$message.success('刷新成功')
+      this.getCheckTopicList()
     }
   }
 }
@@ -133,6 +163,7 @@ export default {
   padding: 30px;
   width: 500px;
   text-align: justify;
+  padding-right: 160px;
   .content-item {
     margin: 10px 0;
   }
@@ -157,7 +188,7 @@ export default {
 }
 .handle-cont {
   position: fixed;
-  right: 30px;
+  left: 580px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
@@ -165,5 +196,8 @@ export default {
   .el-button {
     margin: 10px 0;
   }
+}
+.no-data {
+  cursor: pointer;
 }
 </style>
