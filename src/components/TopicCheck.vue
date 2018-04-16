@@ -143,6 +143,9 @@ export default {
           if (res.data.data) {
             this.checkTopicData = res.data.data
             this.totalCheckTopicCount = res.data.count
+          } else {
+            this.checkTopicData = {}
+            this.totalCheckTopicCount = 0
           }
         })
         .catch(err => {
@@ -160,10 +163,14 @@ export default {
 
 <style lang="scss" scoped>
 .check-cont {
-  padding: 30px;
+  padding: 20px 160px 20px 0;
   width: 500px;
   text-align: justify;
-  padding-right: 160px;
+  .title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
   .content-item {
     margin: 10px 0;
   }
