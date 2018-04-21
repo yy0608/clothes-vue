@@ -14,10 +14,17 @@
     <el-table-column prop="merchant_id.name" label="商家"></el-table-column>
     <el-table-column prop="shop_id.name" label="店铺"></el-table-column>
     <el-table-column prop="category_id.name" label="分类"></el-table-column>
-    <el-table-column label="分类图标">
+    <!-- <el-table-column label="分类图标">
       <template slot-scope="props">
         <copy :content="props.row.category_id.icon">
           <emage :src="/(http:\/\/)|(https:\/\/)/.test(props.row.category_id.icon) ? props.row.category_id.icon : imgOrigin + props.row.category_id.icon + '?imageView2/2/w/60/h/60'" :width="60" :height="60"></emage>
+        </copy>
+      </template>
+    </el-table-column> -->
+    <el-table-column label="封面">
+      <template slot-scope="props">
+        <copy :content="props.row.cover">
+          <emage :src="/(http:\/\/)|(https:\/\/)/.test(props.row.cover) ? props.row.cover : imgOrigin + props.row.cover + '?imageView2/2/w/60/h/60'" :width="60" :height="60"></emage>
         </copy>
       </template>
     </el-table-column>

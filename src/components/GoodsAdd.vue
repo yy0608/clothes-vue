@@ -19,6 +19,9 @@
     <el-form-item label="大概价格" prop="valuation">
       <el-input type="number" v-model.number="form.valuation"></el-input>
     </el-form-item>
+    <el-form-item label="封面图片" prop="cover">
+      <upload :multiple="false" ref="coverUpload" :dirname="'goods/cover'" :onSuccess="uploadCoverSuccess"></upload>
+    </el-form-item>
     <el-form-item label="轮播图片" prop="figure_imgs">
       <upload :multiple="true" ref="figureUpload" :dirname="'goods/figure'" :onSuccess="uploadFigureSuccess"></upload>
     </el-form-item>
@@ -51,6 +54,7 @@ export default {
         title: '',
         category: [],
         valuation: '',
+        cover: '',
         figure_imgs: [],
         detail_imgs: []
       },
@@ -71,6 +75,10 @@ export default {
         valuation: [{
           required: true,
           message: '输入大概价格'
+        }],
+        cover: [{
+          required: true,
+          message: '上传封面图片'
         }],
         figure_imgs: [{
           required: true,
@@ -136,8 +144,10 @@ export default {
             category: formatCategoryForDefaultValue(tempData.category_id, this.categoryList, true) // 此处待优化，不知道哪个请求快，this.categoryList可能为空
           }
           delete this.form.category_id
+          this.origin_cover = tempData.cover
           this.origin_figure_imgs = [ ...tempData.figure_imgs ]
           this.origin_detail_imgs = [ ...tempData.detail_imgs ]
+          this.$refs.coverUpload.uploadKeyList = [ res.data.data.cover ]
           this.$refs.figureUpload.uploadKeyList = [ ...tempData.figure_imgs ]
           this.$refs.detailUpload.uploadKeyList = [ ...tempData.detail_imgs ]
           this.categoryList = null
@@ -180,6 +190,9 @@ export default {
         }])
       }
     },
+    uploadCoverSuccess (val) {
+      this.form.cover = val[0]
+    },
     uploadFigureSuccess (val) {
       this.form.figure_imgs = val
     },
@@ -199,6 +212,7 @@ export default {
         delete data.category
         if (this.goods_id) {
           data.goods_id = this.goods_id
+          data.origin_cover = this.origin_cover
           data.origin_figure_imgs = [ ...this.origin_figure_imgs ]
           data.origin_detail_imgs = [ ...this.origin_detail_imgs ]
           delete data.category_id
