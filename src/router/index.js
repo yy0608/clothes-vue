@@ -199,7 +199,7 @@ router.beforeEach((to, from, next) => {
         loadingInstance.close()
         if (res.data.success) {
           store.commit('changeLoginAuth', true)
-          store.commit('changeUserInfo', res.data.user_info)
+          store.commit('changeUserInfo', res.data.data)
           goDiffPath(to, next, store)
         } else {
           store.commit('changeLoginAuth', false)

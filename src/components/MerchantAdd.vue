@@ -174,8 +174,10 @@ export default {
       this.smsSent = true
       this.startCountDown()
       axios({
-        url: origin + '/employ/add_merchant_sms',
-        method: 'post',
+        // url: origin + '/employ/add_merchant_sms',
+        // method: 'post',
+        url: origin + '/employ/send_sms',
+        method: 'get',
         data: {
           phone: this.form.phone
         },

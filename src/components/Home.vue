@@ -104,9 +104,9 @@ export default {
         this.routerData[2].active = false
       }
       if (/topic_add/i.test(path)) {
-        this.routerData[3].active = true
+        this.routerData[4].active = true
       } else {
-        this.routerData[3].active = false
+        this.routerData[4].active = false
       }
       if (/user_add/i.test(path)) {
         this.routerData[5].active = true
@@ -139,10 +139,11 @@ export default {
 }
 .router-link {
   position: relative;
-  line-height: 60px;
+  // line-height: 60px;
+  padding: 16px 10px;
+  line-height: 20px;
   color: #888;
   margin: 0 5px;
-  padding: 0 10px;
   transition: all ease .1s;
   &:hover, &.active {
     color: #333;

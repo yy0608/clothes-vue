@@ -107,7 +107,7 @@ export default {
           .then(res => {
             if (res.data.success) {
               this.$store.commit('changeLoginAuth', true)
-              this.$store.commit('changeUserInfo', res.data.user_info)
+              this.$store.commit('changeUserInfo', res.data.data)
               this.$router.push('/home')
             } else {
               if (res.data.code === 10001) {
