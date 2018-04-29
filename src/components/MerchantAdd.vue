@@ -178,7 +178,7 @@ export default {
         // method: 'post',
         url: origin + '/employ/send_sms',
         method: 'get',
-        data: {
+        params: {
           phone: this.form.phone
         },
         withCredentials: true
